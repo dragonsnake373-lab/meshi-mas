@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>めしマス｜現地(ここ)で、何食べる？</title>
+<meta name="description" content="ライブ会場の近くで食べられるお店を、イベント・会場・ジャンルから探せるグルメ検索サイト。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="めしマス｜現地(ここ)で、何食べる？">
+<meta property="og:description" content="ライブの日のごはん探しを、もっと楽しく。会場周辺のお店をイベント・会場・ジャンルから探そう。">
+<meta name="twitter:card" content="summary">
+<!-- 公開URLが決まったら og:url と og:image（絶対URL）を追加してください -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%B4%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --pink:#ff74b8;--coral:#f34f6d;--blue:#2681c8;--yellow:#ffc30b;
+  --green:#0fbe94;--sky:#8dbbff;--orange:#f39800;--gray:#656a75;
+  --ink:#303440;--muted:#656a75;--bg:#fff8fb;--line:#f0dfe8;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Noto Sans JP","Yu Gothic",Meiryo,sans-serif;color:var(--ink);background:var(--bg);font-size:17px;line-height:1.65}
+header{min-height:76px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 6%;border-bottom:1px solid var(--line);gap:20px}
+.logo{font-size:30px;font-weight:900;color:var(--coral);letter-spacing:1px;white-space:nowrap}
+nav{display:flex;gap:18px;flex-wrap:wrap;font-size:15px;font-weight:700}
+nav a{color:var(--ink);text-decoration:none}
+nav a:hover{color:var(--coral)}
+.hero{padding:56px 7% 65px;background:linear-gradient(115deg,#ffe5f1,#fff0e8 55%,#e9f4ff)}
+.hero-inner{max-width:1120px;margin:auto}
+.eyebrow{color:var(--coral);font-weight:800;font-size:15px;letter-spacing:1.5px}
+h1{font-size:clamp(34px,5vw,54px);line-height:1.2;margin:12px 0 8px;white-space:nowrap}
+h1 span{color:var(--coral)}
+.tagline{font-size:15px;color:var(--gray);margin:12px 0 0}
+.search{background:#fff;padding:24px;border-radius:20px;box-shadow:0 10px 35px #b84d7c18;margin-top:28px}
+.fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+label{display:block;font-size:15px;font-weight:800;margin-bottom:7px}
+input,select,textarea{width:100%;border:1px solid #e7dce3;border-radius:11px;padding:14px;font-size:16px;background:#fff;color:var(--ink);font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:3px solid #ff74b833;border-color:var(--pink)}
+button{cursor:pointer;border:0;border-radius:11px;padding:13px 18px;font-weight:800;font-size:15px;font-family:inherit;transition:filter .15s,transform .15s}
+button:hover{filter:brightness(.97);transform:translateY(-1px)}
+.primary{background:var(--coral);color:white}
+.search button{width:100%;margin-top:17px;padding:15px}
+main{max-width:1160px;margin:52px auto;padding:0 24px}
+.section{margin-bottom:55px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+h2{font-size:27px;margin:0;line-height:1.35}
+h3{font-size:20px}
+.sub{font-size:15px;color:var(--muted);margin-top:7px}
+.events,.browse-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.event,.browse-card{background:#fff;border:1px solid var(--line);padding:21px;border-radius:16px;box-shadow:0 4px 15px #33333308}
+.event small{color:var(--coral);font-weight:800;font-size:14px}
+.event h3{margin:9px 0;font-size:19px}
+.event p{font-size:15px;color:var(--muted);margin:5px 0 14px}
+.event .view-btn{background:#ffe5ef;color:#c93661}
+.event .actions{margin-top:4px}
+.add-section.editing{border-color:var(--pink);box-shadow:0 0 0 3px #ff74b822}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap}
+.browse-card{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;width:100%;color:var(--ink);font-size:18px}
+.browse-card .browse-icon{font-size:27px}
+.browse-card .browse-name{font-weight:800;flex:1}
+.browse-card .browse-count{font-size:14px;color:var(--muted);white-space:nowrap}
+.browse-card.venue{border-bottom:4px solid var(--blue)}
+.browse-card.genre{border-bottom:4px solid var(--green)}
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.restaurant{background:#fff;border-radius:17px;overflow:hidden;border:1px solid var(--line);box-shadow:0 5px 18px #33333309}
+.restaurant{cursor:pointer;transition:box-shadow .15s,transform .15s}
+.restaurant:hover,.restaurant:focus-visible{box-shadow:0 8px 24px #b84d7c22;transform:translateY(-2px);outline:none}
+.more{font-size:13px;font-weight:800;color:var(--coral);margin-top:10px}
+dialog#detailDialog{border:0;border-radius:20px;padding:0;width:calc(100% - 32px);max-width:640px;max-height:88vh;color:var(--ink);box-shadow:0 20px 60px #0004}
+dialog#detailDialog::backdrop{background:#303440aa}
+.dlg{padding:28px;position:relative}
+.dlg h2{padding-right:44px}
+.close-x{position:absolute;top:16px;right:16px;width:40px;height:40px;padding:0;font-size:22px;background:#f4eef1;color:var(--ink)}
+.review-list{display:grid;gap:12px;margin:12px 0 22px}
+.review{background:#fff8fb;border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+.review-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.review-head button{padding:5px 10px;font-size:12px}
+.review p{margin:6px 0 0;font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.dlg textarea+button{margin-top:14px}
+.info{padding:19px}
+.info h3{margin:0 0 8px;font-size:21px}
+.meta{font-size:15px;color:var(--muted);line-height:1.8;overflow-wrap:anywhere}
+.tags{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.tag{background:#e9f4ff;color:#236da6;padding:5px 11px;border-radius:20px;font-size:13px;font-weight:700}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.actions button{font-size:14px;padding:10px 13px}
+.secondary{background:#e7f2ff;color:#236da6}
+.orange{background:#fff0d8;color:#9b5d00}
+.danger{background:#ffe5e8;color:#c9364c}
+.green{background:#ddf7ef;color:#087e62}
+#empty{color:var(--muted);padding:26px;background:#fff;border-radius:14px}
+.add-section{margin-top:40px;padding:30px;background:#fff;border-radius:19px;border:1px solid var(--line)}
+.add-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.add-section button{margin-top:18px}
+.form-note{font-size:14px;color:var(--muted);margin:8px 0 0}
+footer{background:#343946;color:#fff;padding:35px 7%;margin-top:70px;text-align:center;font-size:15px}
+footer .logo{color:#fff}
+@media(max-width:850px){.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.events,.browse-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ header{padding:12px 18px;align-items:flex-start;flex-direction:column}
+ nav{gap:10px 15px;font-size:14px}
+ .fields,.events,.browse-grid,.results,.add-grid{grid-template-columns:1fr}
+ .hero{padding:40px 18px}
+ main{margin:36px auto;padding:0 16px}
+ h2{font-size:24px}
+ .section-head{align-items:flex-start}
+ h1{font-size:clamp(27px,7vw,38px)}
+ .search{padding:18px}
+}
+</style>
+</head>
+<body>
+<datalist id="genreOptions"></datalist>
+<header>
+  <div class="logo">めしマス.</div>
+  <nav>
+    <a href="#events">イベントから</a>
+    <a href="#venues">会場から</a>
+    <a href="#genres">ジャンルから</a>
+    <a href="#restaurants">お店一覧</a>
+    <a href="#add-restaurant">お店追加</a>
+    <a href="#add-event">イベント追加</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">LIVE × GOURMET × DISCOVERY</div>
+    <h1><span>現地(ここ)で、何食べる？</span></h1>
+    <p class="tagline">ライブの日のごはん探しを、もっと楽しく。</p>
+    <div class="search">
+      <div class="fields">
+        <div><label for="eventSearch">ライブ・イベント名</label><input id="eventSearch" placeholder="例：アイドルマスター"></div>
+        <div><label for="venueSearch">ライブ会場</label><input id="venueSearch" placeholder="例：東京ドーム"></div>
+        <div><label for="dateSearch">開催日</label><input id="dateSearch" type="date"></div>
+        <div><label for="genreSearch">料理ジャンル</label><input id="genreSearch" list="genreOptions" placeholder="例：ラーメン、カフェ"></div>
+      </div>
+      <button class="primary" onclick="searchRestaurants()">この条件でお店を探す →</button>
+    </div>
+  </div>
+</section>
+
+<main>
+  <section id="events" class="section">
+    <div class="section-head"><div><h2>イベントから探す</h2><div class="sub">参加するイベントを選んで、会場周辺のお店をチェック。</div></div></div>
+    <div class="events" id="eventList"></div>
+  </section>
+
+  <section id="venues" class="section">
+    <div class="section-head"><div><h2>会場から探す</h2><div class="sub">ライブ会場を選んで、近くのお店をまとめて探そう。</div></div></div>
+    <div class="browse-grid" id="venueList"></div>
+  </section>
+
+  <section id="genres" class="section">
+    <div class="section-head"><div><h2>ジャンルから探す</h2><div class="sub">食べたい料理のジャンルからお店を探そう。</div></div></div>
+    <div class="browse-grid" id="genreList"></div>
+  </section>
+
+  <section id="restaurants" class="section">
+    <div class="section-head">
+      <div><h2>お店一覧</h2><div class="sub" id="resultDescription">ライブ前後に立ち寄りたいお店を紹介。</div></div>
+      <button class="secondary" onclick="showAllRestaurants()">すべてのお店を表示</button>
+    </div>
+    <div class="results" id="restaurantList"></div>
+    <div id="empty" hidden>条件に合うお店がありません。</div>
+  </section>
+
+  <section class="add-section" id="add-restaurant">
+    <h2>おすすめのお店を追加</h2>
+    <p class="sub">あなたが見つけたお店を登録しよう。</p>
+    <div class="add-grid">
+      <div><label for="newName">お店の名前</label><input id="newName" maxlength="50" placeholder="お店の名前"></div>
+      <div><label for="newVenue">近くのライブ会場</label><input id="newVenue" maxlength="50" placeholder="会場名"></div>
+      <div><label for="newGenre">料理ジャンル</label><input id="newGenre" maxlength="30" list="genreOptions" placeholder="例：ラーメン、居酒屋"></div>
+      <div><label for="newAddress">住所</label><input id="newAddress" maxlength="100" placeholder="お店の住所"></div>
+    </div>
+    <label for="newReview" style="margin-top:16px">口コミ・おすすめポイント</label>
+    <textarea id="newReview" maxlength="500" rows="3" placeholder="ライブ前の食事におすすめ！"></textarea>
+    <button class="primary" onclick="addRestaurant()">お店を登録する ＋</button>
+    <p class="form-note save-note"></p>
+  </section>
+
+  <section class="add-section" id="add-event">
+    <h2 id="eventFormTitle">イベントを追加</h2>
+    <p class="sub">開催予定のライブやイベントを登録できます。登録済みイベントの編集は、イベントカードの「編集」ボタンから。</p>
+    <div class="add-grid">
+      <div><label for="eventNameNew">イベント名</label><input id="eventNameNew" maxlength="60" placeholder="例：ライブツアー 東京公演"></div>
+      <div><label for="eventVenueNew">開催会場</label><input id="eventVenueNew" maxlength="50" placeholder="例：東京ドーム"></div>
+      <div><label for="eventDateNew">開催日</label><input id="eventDateNew" type="date"></div>
+    </div>
+    <div class="form-actions">
+      <button class="primary" id="eventSubmitBtn" onclick="submitEvent()">イベントを登録する ＋</button>
+      <button class="secondary" id="eventCancelBtn" onclick="cancelEventEdit()" hidden>編集をやめる</button>
+    </div>
+    <p class="form-note save-note"></p>
+  </section>
+</main>
+
+<footer>
+  <div class="logo">めしマス.</div>
+  <p>現地(ここ)で、何食べる？</p>
+  <p>LIVE × GOURMET × DISCOVERY</p>
+</footer>
+
+<dialog id="detailDialog"><div class="dlg" id="detailBody"></div></dialog>
+
+<script>
+const RESTAURANT_KEY="mesimasu_restaurants_v2";
+const EVENT_KEY="mesimasu_events_v1";
+let storageWarned=false;
+// ★ Supabase の Project URL と publishable key（sb_publishable_…）を貼ると共有モード。空のままなら端末内のみ保存
+// ※ secret key / service_role key は絶対に貼らないでください
+const SUPABASE_URL="https://gnuvwzqsvnxmrdzbfoti.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA";
+const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
+const sampleEvents=[
+  {id:"event-1",name:"ライブイベント A",venue:"東京ドーム",date:"2026-12-20"},
+  {id:"event-2",name:"ライブイベント B",venue:"横浜アリーナ",date:"2026-12-25"},
+  {id:"event-3",name:"ライブイベント C",venue:"さいたまスーパーアリーナ",date:"2027-01-10"}
+];
+const sampleRestaurants=[
+  {id:"sample-1",name:"サンプルラーメン",venue:"東京ドーム",genre:"ラーメン",address:"東京都文京区後楽1-3",review:"ライブ前におすすめ！"},
+  {id:"sample-2",name:"サンプル食堂",venue:"東京ドーム",genre:"定食",address:"東京都文京区本郷1丁目",review:"ゆっくり食事できるお店。"},
+  {id:"sample-3",name:"横浜グルメキッチン",venue:"横浜アリーナ",genre:"洋食",address:"神奈川県横浜市港北区新横浜",review:"ライブ後にも立ち寄りやすい。"},
+  {id:"sample-4",name:"さいたま酒場",venue:"さいたまスーパーアリーナ",genre:"居酒屋",address:"埼玉県さいたま市中央区",review:"仲間との打ち上げに。"}
+];
+
+// ===== ジャンル表記揺れ対応 =====
+const GENRE_ALIASES={
+  "ラーメン":["らーめん","らぁめん","拉麺","中華そば","ramen"],
+  "カフェ":["cafe","café","喫茶","コーヒー","coffee","カッフェ"],
+  "居酒屋":["いざかや","酒場","大衆酒場"],
+  "定食":["食堂","定食屋"],
+  "洋食":[],
+  "焼肉":["焼き肉","やきにく","yakiniku"],
+  "寿司":["すし","鮨","sushi"],
+  "そば":["蕎麦"],
+  "うどん":[],
+  "カレー":["curry","カリー"],
+  "中華":["中華料理","町中華","chinese"],
+  "イタリアン":["italian","イタリア料理"],
+  "とんかつ":["豚カツ","豚かつ"],
+  "焼鳥":["焼き鳥","やきとり","焼きとり"],
+  "ハンバーガー":["バーガー","burger"],
+  "スイーツ":["sweets","デザート"],
+  "バー":["bar"]
+};
+// 比較用キー：全角半角統一・小文字化・ひらがな→カタカナ・空白/記号/長音を除去
+function genreKey(s){
+  return String(s??"").normalize("NFKC").toLowerCase()
+    .replace(/[\u3041-\u3096]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60))
+    .replace(/[\s・･ー\-－―、，,\/／]/g,"");
+}
+const GENRE_MAP=new Map();
+Object.entries(GENRE_ALIASES).forEach(([canon,list])=>[canon,...list].forEach(a=>GENRE_MAP.set(genreKey(a),canon)));
+// 表記揺れを代表表記にそろえる（辞書にない語は全角半角のみ整えてそのまま）
+function canonicalGenre(s){
+  const raw=String(s??"").normalize("NFKC").trim();
+  if(!raw)return "";
+  const k=genreKey(raw);
+  return GENRE_MAP.get(k)||GENRE_MAP.get(k.replace(/(専門店|料理|屋|店)$/,""))||raw;
+}
+function genreMatches(genre,query){
+  return genreKey(canonicalGenre(genre)).includes(genreKey(canonicalGenre(query)));
+}
+function renderGenreOptions(){
+  const names=new Set([...Object.keys(GENRE_ALIASES),...restaurants.map(r=>canonicalGenre(r.genre)).filter(Boolean)]);
+  document.getElementById("genreOptions").innerHTML=[...names].sort().map(n=>`<option value="${escapeHTML(n)}">`).join("");
+}
+function loadJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return Array.isArray(v)?v:fallback;}catch(e){return fallback;}}
+let restaurants=loadJSON(RESTAURANT_KEY,null);
+if(!restaurants){
+  const legacy=loadJSON("mesimasu_restaurants",[]);
+  restaurants=[...sampleRestaurants,...legacy.map((r,i)=>({...r,id:r.id||"legacy-"+i}))];
+}
+let events=loadJSON(EVENT_KEY,null)||sampleEvents.map(e=>({...e}));
+// 既存データのジャンルを代表表記にそろえる
+{let changed=false;
+ restaurants=restaurants.map(r=>{
+  let n=r;
+  const g=canonicalGenre(r.genre)||"未分類";
+  if(g!==r.genre){n={...n,genre:g};changed=true;}
+  if(!Array.isArray(r.reviews)){
+    const {review,emoji,...rest}=n;
+    const text=String(review??"").trim();
+    n={...rest,reviews:text?[{id:uid("rv"),text,date:null}]:[]};
+    changed=true;
+  }
+  return n;});
+ if(changed)saveRestaurants();}
+let visible=[...restaurants];
+if(SHARED){restaurants=[];events=[];visible=[];}
+
+function safeSave(key,val){
+  if(SHARED)return;
+  try{localStorage.setItem(key,JSON.stringify(val));}
+  catch(e){if(!storageWarned){storageWarned=true;alert("このブラウザでは内容を保存できませんでした。ページを閉じると登録内容は消えます。");}}
+}
+function saveRestaurants(){safeSave(RESTAURANT_KEY,restaurants);}
+function saveEvents(){safeSave(EVENT_KEY,events);}
+// onclick属性の文字列に埋め込んでも安全なエンコード（' ( ) * ! もエスケープ）
+function safeEnc(t){return encodeURIComponent(t).replace(/[!'()*]/g,c=>"%"+c.charCodeAt(0).toString(16).toUpperCase());}
+// ===== 共有モード（Supabase REST） =====
+const SAVE_NOTE=SHARED?"投稿内容は全員に公開されます。URL・個人情報・誹謗中傷は書かないでください。不適切な投稿は通報で非表示になります。":"登録内容はこの端末のブラウザ内にのみ保存され、他の人には表示されません。";
+const TOKEN_KEY="mesimasu_tokens";
+function tokens(){try{return JSON.parse(localStorage.getItem(TOKEN_KEY))||{};}catch(e){return {};}}
+function canDel(id){return !SHARED||!!tokens()[id];}
+async function sha256(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}
+const SB_URL=SUPABASE_URL.trim().replace(/\/+$/,""),SB_KEY=SUPABASE_ANON_KEY.trim();
+async function remote(path,opt={}){
+  let r;
+  try{r=await fetch(SB_URL+"/rest/v1/"+path,{...opt,headers:{apikey:SB_KEY,...(SB_KEY.startsWith("eyJ")?{Authorization:"Bearer "+SB_KEY}:{}),"Content-Type":"application/json",Prefer:"return=minimal",...opt.headers}});}
+  catch(e){const x=new Error("net");x.detail="接続できません: "+e.message;throw x;}
+  if(!r.ok){const t=await r.text();const x=new Error(t.includes("rate_limited")?"rate":opt.method?"post":"load");x.detail="HTTP "+r.status+" "+t.slice(0,300);throw x;}
+  return opt.method?null:r.json();
+}
+async function guarded(fn){
+  try{await fn();}catch(e){
+    console.error(e);
+    const base=e.message==="rate"?"投稿が多すぎます。しばらくしてからもう一度お試しください。":e.message==="post"?"投稿できませんでした。":e.message==="auth"?"この投稿を削除できるのは投稿した本人（同じブラウザ）のみです。":"サーバーとの通信に失敗しました。";
+    alert(base+(e.detail&&e.message!=="rate"?"\n\n【詳細】"+e.detail:(e.detail===undefined&&e.message!=="rate"&&e.message!=="auth"?"\n\n【詳細】"+e.message:"")));
+  }
+}
+async function insertRemote(table,row){
+  const id=crypto.randomUUID(),token=crypto.randomUUID();
+  await remote(table,{method:"POST",body:JSON.stringify({...row,id,owner_hash:await sha256(token)})});
+  const t=tokens();t[id]=token;try{localStorage.setItem(TOKEN_KEY,JSON.stringify(t));}catch(e){}
+  return id;
+}
+async function removeMine(table,id){
+  const t=tokens()[id];if(!t)throw new Error("auth");
+  await remote("rpc/delete_mine",{method:"POST",body:JSON.stringify({tbl:table,rid:id,token:t})});
+  await loadAll();
+}
+async function loadAll(){
+  const [ev,rs,rv]=await Promise.all([
+    remote("events?select=id,name,venue,date&hidden=eq.false&order=date.asc&limit=500"),
+    remote("restaurants?select=id,name,venue,genre,address&hidden=eq.false&order=created_at.desc&limit=1000"),
+    remote("reviews?select=id,restaurant_id,text,created_at&hidden=eq.false&order=created_at.asc&limit=5000")]);
+  events=ev;
+  restaurants=rs.map(r=>({...r,reviews:rv.filter(v=>v.restaurant_id===r.id).map(v=>({id:v.id,text:v.text,date:v.created_at}))}));
+  renderEvents();renderBrowseLists();refreshCurrentResults();
+  if(detailId)renderDetail();
+}
+function reportItem(table,id){
+  if(!confirm("この投稿を不適切として通報しますか？"))return;
+  guarded(async()=>{await remote("reports",{method:"POST",body:JSON.stringify({target_table:table,target_id:id})});alert("通報しました。ご協力ありがとうございます。");});
+}
+function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function uid(prefix){return prefix+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);}
+
+function renderEvents(){
+  document.getElementById("eventList").innerHTML=events.length?events.map(e=>`
+    <article class="event"><small>${escapeHTML(e.date||"開催日未設定")}</small>
+    <h3>${escapeHTML(e.name)}</h3><p>📍 ${escapeHTML(e.venue)}</p>
+    <div class="actions">
+      <button class="view-btn" onclick="selectEvent('${e.id}')">周辺のお店を見る →</button>
+      ${SHARED?"":`<button class="green" onclick="editEvent('${e.id}')">編集</button>`}
+      ${canDel(e.id)?`<button class="danger" onclick="deleteEvent('${e.id}')">削除</button>`:""}${SHARED?`<button class="orange" onclick="reportItem('events','${e.id}')">通報</button>`:""}
+    </div></article>`).join(""):"<p>イベントはまだ登録されていません。</p>";
+}
+function renderBrowseLists(){
+  const venues=[...new Set(restaurants.map(r=>r.venue).filter(Boolean))].sort();
+  const genreByKey=new Map();
+  restaurants.forEach(r=>{const g=canonicalGenre(r.genre);if(g)genreByKey.set(genreKey(g),g);});
+  const genres=[...genreByKey.values()].sort();
+  document.getElementById("venueList").innerHTML=venues.map((v,i)=>`
+    <button class="browse-card venue" onclick="browseVenue('${safeEnc(v)}')">
+      <span class="browse-icon">📍</span><span class="browse-name">${escapeHTML(v)}</span>
+      <span class="browse-count">${restaurants.filter(r=>r.venue===v).length}店舗 →</span>
+    </button>`).join("")||"<p>会場に紐づくお店はまだありません。</p>";
+  document.getElementById("genreList").innerHTML=genres.map(g=>`
+    <button class="browse-card genre" onclick="browseGenre('${safeEnc(g)}')">
+      <span class="browse-icon">🍴</span><span class="browse-name">${escapeHTML(g)}</span>
+      <span class="browse-count">${restaurants.filter(r=>genreKey(canonicalGenre(r.genre))===genreKey(g)).length}店舗 →</span>
+    </button>`).join("")||"<p>ジャンルはまだ登録されていません。</p>";
+  renderGenreOptions();
+}
+function renderRestaurants(){
+  document.getElementById("restaurantList").innerHTML=visible.map(r=>`
+    <article class="restaurant" tabindex="0" role="button" onclick="openDetail('${r.id}')" onkeydown="if(event.key==='Enter'&&event.target===this)openDetail('${r.id}')">
+    <div class="info"><h3>${escapeHTML(r.name)}</h3>
+    <div class="meta">📍 ${escapeHTML(r.venue)} 周辺<br>${escapeHTML(r.address)}</div>
+    <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span></div>
+    <p class="meta">${escapeHTML(latestReview(r)||"口コミはまだありません。")}</p>
+    <div class="actions" onclick="event.stopPropagation()">
+      <button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップ</button>
+      <button class="orange" onclick="reviewRestaurant('${r.id}')">口コミを書く</button>
+      ${SHARED?"":`<button class="green" onclick="editRestaurant('${r.id}')">編集</button>`}
+      ${canDel(r.id)?`<button class="danger" onclick="deleteRestaurant('${r.id}')">削除</button>`:""}
+    </div>
+    <div class="more">詳細・口コミ一覧を見る（${(r.reviews||[]).length}件） →</div></div></article>`).join("");
+  document.getElementById("empty").hidden=visible.length!==0;
+}
+function selectEvent(id){
+  const e=events.find(x=>x.id===id);if(!e)return;
+  document.getElementById("eventSearch").value=e.name;
+  document.getElementById("venueSearch").value=e.venue;
+  document.getElementById("dateSearch").value=e.date||"";
+  document.getElementById("genreSearch").value="";
+  searchRestaurants();
+}
+function browseVenue(encoded){
+  document.getElementById("eventSearch").value="";
+  document.getElementById("venueSearch").value=decodeURIComponent(encoded);
+  document.getElementById("dateSearch").value="";
+  document.getElementById("genreSearch").value="";
+  searchRestaurants();
+}
+function browseGenre(encoded){
+  document.getElementById("eventSearch").value="";
+  document.getElementById("venueSearch").value="";
+  document.getElementById("dateSearch").value="";
+  document.getElementById("genreSearch").value=decodeURIComponent(encoded);
+  searchRestaurants();
+}
+function searchRestaurants(){
+  const eventText=document.getElementById("eventSearch").value.trim();
+  const venueText=document.getElementById("venueSearch").value.trim();
+  const dateText=document.getElementById("dateSearch").value;
+  const genreText=document.getElementById("genreSearch").value.trim();
+  const matchingEvents=events.filter(e=>
+    (!eventText||e.name.includes(eventText))&&
+    (!venueText||e.venue.includes(venueText))&&
+    (!dateText||e.date===dateText)
+  );
+  const eventActive=!!(eventText||dateText);
+  visible=restaurants.filter(r=>
+    (!venueText||r.venue.includes(venueText))&&
+    (!genreText||genreMatches(r.genre,genreText))&&
+    (!eventActive||matchingEvents.some(e=>e.venue===r.venue))
+  );
+  const terms=[eventText,venueText,dateText,genreText].filter(Boolean);
+  document.getElementById("resultDescription").textContent=terms.length?terms.join(" / ")+" の検索結果":"すべてのお店";
+  renderRestaurants();
+  document.getElementById("restaurants").scrollIntoView({behavior:"smooth"});
+}
+function showAllRestaurants(){
+  ["eventSearch","venueSearch","dateSearch","genreSearch"].forEach(id=>document.getElementById(id).value="");
+  visible=[...restaurants];
+  document.getElementById("resultDescription").textContent="すべてのお店";
+  renderRestaurants();
+}
+let editingEventId=null;
+function clearEventForm(){["eventNameNew","eventVenueNew","eventDateNew"].forEach(id=>document.getElementById(id).value="");}
+function setEventFormMode(editing){
+  document.getElementById("add-event").classList.toggle("editing",editing);
+  document.getElementById("eventFormTitle").textContent=editing?"イベントを編集":"イベントを追加";
+  document.getElementById("eventSubmitBtn").textContent=editing?"変更を保存する ✓":"イベントを登録する ＋";
+  document.getElementById("eventCancelBtn").hidden=!editing;
+}
+function submitEvent(){
+  const name=document.getElementById("eventNameNew").value.trim();
+  const venue=document.getElementById("eventVenueNew").value.trim();
+  const date=document.getElementById("eventDateNew").value;
+  if(!name||!venue||!date){alert("イベント名・開催会場・開催日はすべて入力してください。");return;}
+  if(editingEventId){
+    const e=events.find(x=>x.id===editingEventId);
+    if(e)Object.assign(e,{name,venue,date});
+    editingEventId=null;setEventFormMode(false);clearEventForm();
+    saveEvents();renderEvents();refreshCurrentResults();
+    alert("イベントを更新しました！");return;
+  }
+  if(SHARED){guarded(async()=>{await insertRemote("events",{name,venue,date});await loadAll();clearEventForm();alert("イベントを登録しました！");});return;}
+  events.push({id:uid("event"),name,venue,date});
+  saveEvents();renderEvents();clearEventForm();
+  alert("イベントを登録しました！");
+}
+function editEvent(id){
+  const e=events.find(x=>x.id===id);if(!e)return;
+  editingEventId=id;
+  document.getElementById("eventNameNew").value=e.name;
+  document.getElementById("eventVenueNew").value=e.venue;
+  document.getElementById("eventDateNew").value=e.date||"";
+  setEventFormMode(true);
+  document.getElementById("add-event").scrollIntoView({behavior:"smooth"});
+}
+function cancelEventEdit(){editingEventId=null;clearEventForm();setEventFormMode(false);}
+function deleteEvent(id){
+  const e=events.find(x=>x.id===id);if(!e)return;
+  if(!confirm("「"+e.name+"」を削除します。よろしいですか？"))return;
+  if(SHARED){guarded(()=>removeMine("events",id));return;}
+  events=events.filter(x=>x.id!==id);
+  if(editingEventId===id)cancelEventEdit();
+  saveEvents();renderEvents();refreshCurrentResults();
+}
+function addRestaurant(){
+  const name=document.getElementById("newName").value.trim();
+  const venue=document.getElementById("newVenue").value.trim();
+  const genre=document.getElementById("newGenre").value.trim();
+  const address=document.getElementById("newAddress").value.trim();
+  const review=document.getElementById("newReview").value.trim();
+  if(!name||!venue||!address){alert("お店の名前・会場・住所を入力してください。");return;}
+  if(SHARED){guarded(async()=>{
+    const id=await insertRemote("restaurants",{name:name.slice(0,50),venue:venue.slice(0,50),genre:(canonicalGenre(genre)||"未分類").slice(0,30),address:address.slice(0,100)});
+    if(review)await insertRemote("reviews",{restaurant_id:id,text:review.slice(0,500)});
+    await loadAll();["newName","newVenue","newGenre","newAddress","newReview"].forEach(i=>document.getElementById(i).value="");
+    alert("お店を追加しました！");});return;}
+  restaurants.push({id:uid("shop"),name,venue,genre:canonicalGenre(genre)||"未分類",address,reviews:review?[{id:uid("rv"),text:review,date:new Date().toISOString()}]:[]});
+  saveRestaurants();showAllRestaurants();renderBrowseLists();
+  ["newName","newVenue","newGenre","newAddress","newReview"].forEach(id=>document.getElementById(id).value="");
+  alert("お店を追加しました！");
+}
+function editRestaurant(id){
+  const r=restaurants.find(x=>x.id===id);if(!r)return;
+  const name=prompt("お店の名前",r.name);if(name===null)return;
+  const venue=prompt("近くのライブ会場",r.venue);if(venue===null)return;
+  const genre=prompt("料理ジャンル",r.genre||"");if(genre===null)return;
+  const address=prompt("住所",r.address);if(address===null)return;
+  if(!name.trim()||!venue.trim()||!address.trim()){alert("お店の名前・会場・住所は必須です。");return;}
+  Object.assign(r,{name:name.trim().slice(0,50),venue:venue.trim().slice(0,50),genre:canonicalGenre(genre).slice(0,30)||"未分類",address:address.trim().slice(0,100)});
+  saveRestaurants();refreshCurrentResults();renderBrowseLists();alert("お店情報を更新しました。");
+}
+function deleteRestaurant(id){
+  const r=restaurants.find(x=>x.id===id);if(!r)return;
+  if(!confirm("「"+r.name+"」を削除します。よろしいですか？"))return;
+  if(SHARED){guarded(()=>removeMine("restaurants",id));return;}
+  restaurants=restaurants.filter(x=>x.id!==id);
+  saveRestaurants();refreshCurrentResults();renderBrowseLists();
+}
+function refreshCurrentResults(){
+  const eventText=document.getElementById("eventSearch").value.trim();
+  const venueText=document.getElementById("venueSearch").value.trim();
+  const dateText=document.getElementById("dateSearch").value;
+  const genreText=document.getElementById("genreSearch").value.trim();
+  const matches=events.filter(e=>(!eventText||e.name.includes(eventText))&&(!venueText||e.venue.includes(venueText))&&(!dateText||e.date===dateText));
+  visible=restaurants.filter(r=>(!venueText||r.venue.includes(venueText))&&(!genreText||genreMatches(r.genre,genreText))&&(!(eventText||dateText)||matches.some(e=>e.venue===r.venue)));
+  renderRestaurants();
+}
+function latestReview(r){const l=r.reviews||[];return l.length?l[l.length-1].text:"";}
+function fmtDate(d){return d?new Date(d).toLocaleString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"投稿日不明";}
+let detailId=null;
+function openDetail(id,focusReview){
+  if(!restaurants.find(x=>x.id===id))return;
+  detailId=id;renderDetail();
+  const d=document.getElementById("detailDialog");
+  if(!d.open)d.showModal();
+  if(focusReview)document.getElementById("detailReviewInput").focus();
+}
+function closeDetail(){detailId=null;document.getElementById("detailDialog").close();}
+function renderDetail(){
+  const r=restaurants.find(x=>x.id===detailId);if(!r){return;}
+  const list=[...(r.reviews||[])].reverse();
+  document.getElementById("detailBody").innerHTML=`
+    <button class="close-x" onclick="closeDetail()" aria-label="閉じる">×</button>
+    <h2>${escapeHTML(r.name)}</h2>
+    <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span></div>
+    <div class="meta">📍 ${escapeHTML(r.venue)} 周辺<br>${escapeHTML(r.address)}</div>
+    <div class="actions"><button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップで見る</button>${SHARED?`<button class="orange" onclick="reportItem('restaurants','${r.id}')">通報</button>`:""}</div>
+    <h3>口コミ一覧（${list.length}件）</h3>
+    <div class="review-list">${list.map(v=>`<div class="review">
+      <div class="review-head"><span>${escapeHTML(fmtDate(v.date))}</span><span>${canDel(v.id)?`<button class="danger" onclick="deleteReview('${v.id}')">削除</button>`:""}${SHARED?` <button class="orange" onclick="reportItem('reviews','${v.id}')">通報</button>`:""}</span></div>
+      <p>${escapeHTML(v.text)}</p></div>`).join("")||'<p class="meta">口コミはまだありません。最初の口コミを書いてみよう！</p>'}</div>
+    <label for="detailReviewInput">口コミを書く</label>
+    <textarea id="detailReviewInput" maxlength="500" rows="3" placeholder="ライブ前の食事におすすめ！"></textarea>
+    <button class="primary" onclick="addReview()">口コミを投稿する</button>
+    <p class="form-note">${SAVE_NOTE}</p>`;
+}
+function reviewRestaurant(id){openDetail(id,true);}
+function addReview(){
+  const r=restaurants.find(x=>x.id===detailId);if(!r)return;
+  const text=document.getElementById("detailReviewInput").value.trim();
+  if(!text){alert("口コミを入力してください。");return;}
+  if(SHARED){guarded(async()=>{await insertRemote("reviews",{restaurant_id:r.id,text:text.slice(0,500)});await loadAll();});return;}
+  r.reviews=r.reviews||[];
+  r.reviews.push({id:uid("rv"),text,date:new Date().toISOString()});
+  saveRestaurants();renderDetail();renderRestaurants();
+}
+function deleteReview(rid){
+  const r=restaurants.find(x=>x.id===detailId);if(!r)return;
+  if(!confirm("この口コミを削除します。よろしいですか？"))return;
+  if(SHARED){guarded(()=>removeMine("reviews",rid));return;}
+  r.reviews=(r.reviews||[]).filter(v=>v.id!==rid);
+  saveRestaurants();renderDetail();renderRestaurants();
+}
+function openMap(query){window.open("https://www.google.com/maps/search/?api=1&query="+query,"_blank","noopener");}
+document.getElementById("detailDialog").addEventListener("click",e=>{if(e.target.id==="detailDialog")closeDetail();});
+document.getElementById("detailDialog").addEventListener("close",()=>{detailId=null;});
+renderEvents();renderBrowseLists();renderRestaurants();
+document.querySelectorAll(".save-note").forEach(n=>n.textContent=SAVE_NOTE);
+if(SHARED)loadAll().catch(e=>{console.error(e);alert("サーバーに接続できませんでした。\n\n【詳細】"+(e.detail||e.message));});
+</script>
+</body>
+</html>
