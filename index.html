@@ -8,9 +8,13 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="めしマス｜現地(ここ)で、何食べる？">
 <meta property="og:description" content="ライブの日のごはん探しを、もっと楽しく。会場周辺のお店をイベント・会場・ジャンルから探そう。">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://dragonsnake373-lab.github.io/meshi-mas/ogp.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="めしマス｜現地(ここ)で、何食べる？ ライブ会場の近くのお店を、みんなで共有">
+<meta name="twitter:image" content="https://dragonsnake373-lab.github.io/meshi-mas/ogp.png?v=1">
 <meta property="og:url" content="https://dragonsnake373-lab.github.io/meshi-mas/">
-<!-- 公開URLが決まったら og:url と og:image（絶対URL）を追加してください -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%B4%3C/text%3E%3C/svg%3E">
 <script>(function(){try{var t=localStorage.getItem("mesimasu_theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=t;}catch(e){}})();</script>
 <style>
@@ -238,7 +242,8 @@ const EVENT_KEY="mesimasu_events_v1";
 let storageWarned=false;
 // ★ Supabase の Project URL と publishable key（sb_publishable_…）を貼ると共有モード。空のままなら端末内のみ保存
 // ※ secret key / service_role key は絶対に貼らないでください
-const SUPABASE_URL="https://gnuvwzqsvnxmrdzbfoti.supabase.co";
+const SUPABASE_URL="https://gnuvwzqsvnxmrdzbfoti.supabase.co
+";
 const SUPABASE_ANON_KEY="sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA";
 const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
 const sampleEvents=[
