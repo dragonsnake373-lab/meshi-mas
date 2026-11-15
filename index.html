@@ -9,6 +9,7 @@
 <meta property="og:title" content="めしマス｜現地(ここ)で、何食べる？">
 <meta property="og:description" content="ライブの日のごはん探しを、もっと楽しく。会場周辺のお店をイベント・会場・ジャンルから探そう。">
 <meta name="twitter:card" content="summary">
+<meta property="og:url" content="https://dragonsnake373-lab.github.io/meshi-mas/">
 <!-- 公開URLが決まったら og:url と og:image（絶対URL）を追加してください -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%B4%3C/text%3E%3C/svg%3E">
 <style>
@@ -321,9 +322,13 @@ async function guarded(fn){
     alert(base+(e.detail&&e.message!=="rate"?"\n\n【詳細】"+e.detail:(e.detail===undefined&&e.message!=="rate"&&e.message!=="auth"?"\n\n【詳細】"+e.message:"")));
   }
 }
+// 管理者モード：URLの #admin=合言葉 を一度開くと、このブラウザにだけ保存される（サーバーには合言葉のハッシュのみ保存）
+const ADMIN_STORE="mesimasu_admin";
+(function(){const m=location.hash.match(/^#admin=(.+)$/);if(m){try{localStorage.setItem(ADMIN_STORE,decodeURIComponent(m[1]));}catch(e){}history.replaceState(null,"",location.pathname+location.search);}})();
+function adminKey(){try{return localStorage.getItem(ADMIN_STORE)||"";}catch(e){return "";}}
 async function insertRemote(table,row){
   const id=crypto.randomUUID(),token=crypto.randomUUID();
-  await remote(table,{method:"POST",body:JSON.stringify({...row,id,owner_hash:await sha256(token)})});
+  await remote(table,{method:"POST",body:JSON.stringify({...row,id,owner_hash:await sha256(token),...(adminKey()?{admin_key:adminKey()}:{})})});
   const t=tokens();t[id]=token;try{localStorage.setItem(TOKEN_KEY,JSON.stringify(t));}catch(e){}
   return id;
 }
@@ -578,6 +583,7 @@ document.getElementById("detailDialog").addEventListener("click",e=>{if(e.target
 document.getElementById("detailDialog").addEventListener("close",()=>{detailId=null;});
 renderEvents();renderBrowseLists();renderRestaurants();
 document.querySelectorAll(".save-note").forEach(n=>n.textContent=SAVE_NOTE);
+if(SHARED&&adminKey()){const f=document.querySelector("footer"),a=document.createElement("p");a.textContent="🔧 管理者モード";f.appendChild(a);}
 if(SHARED)loadAll().catch(e=>{console.error(e);alert("サーバーに接続できませんでした。\n\n【詳細】"+(e.detail||e.message));});
 </script>
 </body>
