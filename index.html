@@ -488,7 +488,7 @@ function initFolds(){
 // ===== Xで共有 =====
 function shareShop(id){
   const r=restaurants.find(x=>x.id===id);if(!r)return;
-  const text="「"+r.name+"」（"+r.venue+"周辺・"+(r.genre||"未分類")+"）\n#めしマス #ライブ飯";
+  const text="「"+r.name+"」（"+r.venue+"周辺・"+(r.genre||"未分類")+"）\n#めしマス #アイマス";
   window.open("https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(location.origin+location.pathname+"#shop="+id),"_blank","noopener");
 }
 let hashDone=false;
