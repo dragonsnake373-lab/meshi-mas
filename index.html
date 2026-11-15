@@ -108,6 +108,16 @@ footer .logo{color:#fff}
  h1{font-size:clamp(27px,7vw,38px)}
  .search{padding:18px}
 }
+[hidden]{display:none!important}
+.fold{width:42px;height:42px;padding:0;border-radius:50%;background:#fff;border:1px solid var(--line);color:var(--coral);font-size:16px;flex:none}
+.picker{margin-bottom:8px}
+.tag-label{font-weight:800;font-size:14px;margin:14px 0 8px}
+.chip{display:inline-block;position:relative;margin:0 8px 8px 0;font-size:14px;font-weight:600}
+.chip input{position:absolute;opacity:0;width:1px;height:1px;padding:0}
+.chip span{display:inline-block;padding:8px 14px;border:1px solid #e7dce3;border-radius:999px;background:#fff;cursor:pointer}
+.chip input:checked+span{background:var(--green);border-color:var(--green);color:#fff}
+.chip input:focus-visible+span{outline:2px solid var(--blue)}
+.tag.live{background:#e7f8f3;color:#0a8f6f}
 </style>
 </head>
 <body>
@@ -136,6 +146,7 @@ footer .logo{color:#fff}
         <div><label for="dateSearch">開催日</label><input id="dateSearch" type="date"></div>
         <div><label for="genreSearch">料理ジャンル</label><input id="genreSearch" list="genreOptions" placeholder="例：ラーメン、カフェ"></div>
       </div>
+      <div class="tag-label">ライブ向きタグで絞り込み</div><div id="tagFilter"></div>
       <button class="primary" onclick="searchRestaurants()">この条件でお店を探す →</button>
     </div>
   </div>
@@ -171,12 +182,13 @@ footer .logo{color:#fff}
     <p class="sub">あなたが見つけたお店を登録しよう。</p>
     <div class="add-grid">
       <div><label for="newName">お店の名前</label><input id="newName" maxlength="50" placeholder="お店の名前"></div>
-      <div><label for="newVenue">近くのライブ会場</label><input id="newVenue" maxlength="50" placeholder="会場名"></div>
-      <div><label for="newGenre">料理ジャンル</label><input id="newGenre" maxlength="30" list="genreOptions" placeholder="例：ラーメン、居酒屋"></div>
+      <div><label for="newVenue">近くのライブ会場</label><select class="picker" data-for="newVenue" data-kind="venue"></select><input id="newVenue" maxlength="50" placeholder="会場名を入力" hidden></div>
+      <div><label for="newGenre">料理ジャンル</label><select class="picker" data-for="newGenre" data-kind="genre"></select><input id="newGenre" maxlength="30" placeholder="ジャンルを入力" hidden></div>
       <div><label for="newAddress">住所</label><input id="newAddress" maxlength="100" placeholder="お店の住所"></div>
     </div>
     <label for="newReview" style="margin-top:16px">口コミ・おすすめポイント</label>
     <textarea id="newReview" maxlength="500" rows="3" placeholder="ライブ前の食事におすすめ！"></textarea>
+    <div class="tag-label">ライブ向きタグ（任意・複数選択可）</div><div id="newTagPick"></div>
     <button class="primary" onclick="addRestaurant()">お店を登録する ＋</button>
     <p class="form-note save-note"></p>
   </section>
@@ -186,7 +198,7 @@ footer .logo{color:#fff}
     <p class="sub">開催予定のライブやイベントを登録できます。</p>
     <div class="add-grid">
       <div><label for="eventNameNew">イベント名</label><input id="eventNameNew" maxlength="60" placeholder="例：ライブツアー 東京公演"></div>
-      <div><label for="eventVenueNew">開催会場</label><input id="eventVenueNew" maxlength="50" placeholder="例：東京ドーム"></div>
+      <div><label for="eventVenueNew">開催会場</label><select class="picker" data-for="eventVenueNew" data-kind="venue"></select><input id="eventVenueNew" maxlength="50" placeholder="会場名を入力" hidden></div>
       <div><label for="eventDateNew">開催日</label><input id="eventDateNew" type="date"></div>
     </div>
     <div class="form-actions">
@@ -268,6 +280,28 @@ function renderGenreOptions(){
   const names=new Set([...Object.keys(GENRE_ALIASES),...restaurants.map(r=>canonicalGenre(r.genre)).filter(Boolean)]);
   document.getElementById("genreOptions").innerHTML=[...names].sort().map(n=>`<option value="${escapeHTML(n)}">`).join("");
 }
+// ===== 会場名の表記揺れ対応 =====
+const VENUE_ALIASES={
+  "東京ドーム":["tokyo dome"],"横浜アリーナ":["yokohama arena"],
+  "さいたまスーパーアリーナ":["埼玉スーパーアリーナ","saitama super arena"],
+  "日本武道館":["武道館","budokan","nippon budokan"],"幕張メッセ":["makuhari messe","幕張"],
+  "国立競技場":["national stadium"],"有明アリーナ":["ariake arena"],"東京ガーデンシアター":["tokyo garden theater"],
+  "Kアリーナ横浜":["k-arena yokohama"],"ぴあアリーナMM":["pia arena mm","ぴあアリーナ"],
+  "大阪城ホール":["osaka-jo hall"],"京セラドーム大阪":["京セラドーム","kyocera dome osaka"],
+  "東京国際フォーラム":["tokyo international forum"],"NHKホール":["nhk hall"],
+  "国立代々木競技場":["代々木体育館","代々木第一体育館"],
+  "みずほPayPayドーム福岡":["福岡ドーム","paypayドーム","福岡paypayドーム","ヤフオクドーム"],
+  "ベルーナドーム":["西武ドーム","メットライフドーム"],"バンテリンドーム ナゴヤ":["ナゴヤドーム","名古屋ドーム"],
+  "札幌ドーム":["sapporo dome"],"IGアリーナ":["名古屋ガイシホール","ガイシホール"]
+};
+const VENUE_MAP=new Map();
+Object.entries(VENUE_ALIASES).forEach(([c,l])=>[c,...l].forEach(a=>VENUE_MAP.set(genreKey(a),c)));
+function canonicalVenue(s){
+  const raw=String(s??"").normalize("NFKC").trim();if(!raw)return "";
+  const k=genreKey(raw);
+  return VENUE_MAP.get(k)||VENUE_MAP.get(k.replace(/(周辺|付近|近く)$/,""))||raw;
+}
+function venueMatches(v,q){return genreKey(v).includes(genreKey(canonicalVenue(q)));}
 function loadJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return Array.isArray(v)?v:fallback;}catch(e){return fallback;}}
 let restaurants=loadJSON(RESTAURANT_KEY,null);
 if(!restaurants){
@@ -281,6 +315,7 @@ let events=loadJSON(EVENT_KEY,null)||sampleEvents.map(e=>({...e}));
   let n=r;
   const g=canonicalGenre(r.genre)||"未分類";
   if(g!==r.genre){n={...n,genre:g};changed=true;}
+  const vv=canonicalVenue(r.venue)||r.venue;if(vv!==r.venue){n={...n,venue:vv};changed=true;}
   if(!Array.isArray(r.reviews)){
     const {review,emoji,...rest}=n;
     const text=String(review??"").trim();
@@ -289,6 +324,7 @@ let events=loadJSON(EVENT_KEY,null)||sampleEvents.map(e=>({...e}));
   }
   return n;});
  if(changed)saveRestaurants();}
+events=events.map(e=>({...e,venue:canonicalVenue(e.venue)||e.venue}));
 let visible=[...restaurants];
 if(SHARED){restaurants=[];events=[];visible=[];}
 
@@ -341,16 +377,68 @@ async function loadAll(){
   const [ev,rs,rv]=await Promise.all([
     remote("events?select=id,name,venue,date&hidden=eq.false&order=date.asc&limit=500"),
     remote("restaurants?select=id,name,venue,genre,address&hidden=eq.false&order=created_at.desc&limit=1000"),
-    remote("reviews?select=id,restaurant_id,text,created_at&hidden=eq.false&order=created_at.asc&limit=5000")]);
-  events=ev;
-  restaurants=rs.map(r=>({...r,reviews:rv.filter(v=>v.restaurant_id===r.id).map(v=>({id:v.id,text:v.text,date:v.created_at}))}));
+    remote("reviews?select=id,restaurant_id,text,tags,created_at&hidden=eq.false&order=created_at.asc&limit=5000")]);
+  events=ev.map(e=>({...e,venue:canonicalVenue(e.venue)||e.venue}));
+  restaurants=rs.map(r=>({...r,venue:canonicalVenue(r.venue)||r.venue,reviews:rv.filter(v=>v.restaurant_id===r.id).map(v=>({id:v.id,text:v.text,tags:v.tags||[],date:v.created_at}))}));
   renderEvents();renderBrowseLists();refreshCurrentResults();
   if(detailId)renderDetail();
+  openFromHash();
 }
 function reportItem(table,id){
   if(!confirm("この投稿を不適切として通報しますか？"))return;
   guarded(async()=>{await remote("reports",{method:"POST",body:JSON.stringify({target_table:table,target_id:id})});alert("通報しました。ご協力ありがとうございます。");});
 }
+// ===== ライブ向きタグ =====
+const LIVE_TAGS=["開演前に入りやすい","ライブ後も営業","一人でも入りやすい","大きな荷物OK","会場から近い","待ち時間が短い","グループ向き"];
+function tagPickHTML(id){return `<div class="tagpick" id="${id}">`+LIVE_TAGS.map(t=>`<label class="chip"><input type="checkbox" value="${t}"><span>${t}</span></label>`).join("")+"</div>";}
+function pickedTags(id){return [...document.querySelectorAll("#"+id+" input:checked")].map(i=>i.value);}
+function resetTags(id){document.querySelectorAll("#"+id+" input").forEach(i=>i.checked=false);}
+function shopTags(r){const c={};(r.reviews||[]).forEach(v=>(v.tags||[]).forEach(t=>c[t]=(c[t]||0)+1));return c;}
+function tagsMatch(r,sel){const c=shopTags(r);return sel.every(t=>c[t]);}
+function liveTagsHTML(r){return Object.entries(shopTags(r)).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([t,n])=>`<span class="tag live">${escapeHTML(t)} ×${n}</span>`).join("");}
+// ===== 選択式（リストにない場合は「その他」で入力） =====
+function pickerOptions(kind){
+  const used=restaurants.map(r=>kind==="venue"?r.venue:canonicalGenre(r.genre));
+  if(kind==="venue")events.forEach(e=>used.push(e.venue));
+  return [...new Set([...Object.keys(kind==="venue"?VENUE_ALIASES:GENRE_ALIASES),...used.filter(Boolean)])].sort((a,b)=>a.localeCompare(b,"ja"));
+}
+function renderPickers(){
+  document.querySelectorAll("select.picker").forEach(sel=>{
+    sel.innerHTML='<option value="">選択してください</option>'+pickerOptions(sel.dataset.kind).map(o=>`<option value="${escapeHTML(o)}">${escapeHTML(o)}</option>`).join("")+'<option value="__other">その他（入力する）</option>';
+    syncPicker(sel.dataset.for);
+  });
+}
+function syncPicker(id){
+  const input=document.getElementById(id),sel=document.querySelector(`select.picker[data-for="${id}"]`),v=input.value;
+  const has=v!==""&&[...sel.options].some(o=>o.value===v);
+  sel.value=v===""?"":has?v:"__other";
+  input.hidden=sel.value!=="__other";
+}
+function resetPickers(){document.querySelectorAll("select.picker").forEach(s=>syncPicker(s.dataset.for));}
+document.addEventListener("change",e=>{
+  const sel=e.target;if(!sel.matches||!sel.matches("select.picker"))return;
+  const input=document.getElementById(sel.dataset.for);
+  if(sel.value==="__other"){input.value="";input.hidden=false;input.focus();}
+  else{input.value=sel.value;input.hidden=true;}
+});
+// ===== 折りたたみ（スマホでは最初から閉じる） =====
+function initFolds(){
+  [["events","eventList"],["venues","venueList"],["genres","genreList"]].forEach(([sec,list])=>{
+    const head=document.querySelector("#"+sec+" .section-head"),body=document.getElementById(list);
+    const b=document.createElement("button");b.type="button";b.className="fold";
+    const set=open=>{body.hidden=!open;b.textContent=open?"▲":"▼";b.setAttribute("aria-expanded",open);b.setAttribute("aria-label",open?"閉じる":"開く");};
+    b.onclick=()=>set(body.hidden);head.appendChild(b);
+    set(!matchMedia("(max-width:700px)").matches);
+  });
+}
+// ===== Xで共有 =====
+function shareShop(id){
+  const r=restaurants.find(x=>x.id===id);if(!r)return;
+  const text="「"+r.name+"」（"+r.venue+"周辺・"+(r.genre||"未分類")+"）\n#めしマス #ライブ飯";
+  window.open("https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(location.origin+location.pathname+"#shop="+id),"_blank","noopener");
+}
+let hashDone=false;
+function openFromHash(){const m=location.hash.match(/^#shop=([\w-]+)$/);if(m&&!hashDone){hashDone=true;openDetail(m[1]);}}
 function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function uid(prefix){return prefix+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);}
 
@@ -379,18 +467,19 @@ function renderBrowseLists(){
       <span class="browse-icon">🍴</span><span class="browse-name">${escapeHTML(g)}</span>
       <span class="browse-count">${restaurants.filter(r=>genreKey(canonicalGenre(r.genre))===genreKey(g)).length}店舗 →</span>
     </button>`).join("")||"<p>ジャンルはまだ登録されていません。</p>";
-  renderGenreOptions();
+  renderGenreOptions();renderPickers();
 }
 function renderRestaurants(){
   document.getElementById("restaurantList").innerHTML=visible.map(r=>`
     <article class="restaurant" tabindex="0" role="button" onclick="openDetail('${r.id}')" onkeydown="if(event.key==='Enter'&&event.target===this)openDetail('${r.id}')">
     <div class="info"><h3>${escapeHTML(r.name)}</h3>
     <div class="meta">📍 ${escapeHTML(r.venue)} 周辺<br>${escapeHTML(r.address)}</div>
-    <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span></div>
+    <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span>${liveTagsHTML(r)}</div>
     <p class="meta">${escapeHTML(latestReview(r)||"口コミはまだありません。")}</p>
     <div class="actions" onclick="event.stopPropagation()">
       <button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップ</button>
       <button class="orange" onclick="reviewRestaurant('${r.id}')">口コミを書く</button>
+      ${SHARED?`<button class="secondary" onclick="shareShop('${r.id}')">Xで共有</button>`:""}
       ${SHARED?"":`<button class="green" onclick="editRestaurant('${r.id}')">編集</button>`}
       ${canDel(r.id)?`<button class="danger" onclick="deleteRestaurant('${r.id}')">削除</button>`:""}
     </div>
@@ -426,16 +515,17 @@ function searchRestaurants(){
   const genreText=document.getElementById("genreSearch").value.trim();
   const matchingEvents=events.filter(e=>
     (!eventText||e.name.includes(eventText))&&
-    (!venueText||e.venue.includes(venueText))&&
+    (!venueText||venueMatches(e.venue,venueText))&&
     (!dateText||e.date===dateText)
   );
   const eventActive=!!(eventText||dateText);
   visible=restaurants.filter(r=>
-    (!venueText||r.venue.includes(venueText))&&
+    (!venueText||venueMatches(r.venue,venueText))&&
     (!genreText||genreMatches(r.genre,genreText))&&
-    (!eventActive||matchingEvents.some(e=>e.venue===r.venue))
+    (!eventActive||matchingEvents.some(e=>e.venue===r.venue))&&
+    tagsMatch(r,pickedTags("tagFilter"))
   );
-  const terms=[eventText,venueText,dateText,genreText].filter(Boolean);
+  const terms=[eventText,venueText,dateText,genreText,...pickedTags("tagFilter")].filter(Boolean);
   document.getElementById("resultDescription").textContent=terms.length?terms.join(" / ")+" の検索結果":"すべてのお店";
   renderRestaurants();
   document.getElementById("restaurants").scrollIntoView({behavior:"smooth"});
@@ -447,7 +537,7 @@ function showAllRestaurants(){
   renderRestaurants();
 }
 let editingEventId=null;
-function clearEventForm(){["eventNameNew","eventVenueNew","eventDateNew"].forEach(id=>document.getElementById(id).value="");}
+function clearEventForm(){["eventNameNew","eventVenueNew","eventDateNew"].forEach(id=>document.getElementById(id).value="");resetPickers();}
 function setEventFormMode(editing){
   document.getElementById("add-event").classList.toggle("editing",editing);
   document.getElementById("eventFormTitle").textContent=editing?"イベントを編集":"イベントを追加";
@@ -456,7 +546,7 @@ function setEventFormMode(editing){
 }
 function submitEvent(){
   const name=document.getElementById("eventNameNew").value.trim();
-  const venue=document.getElementById("eventVenueNew").value.trim();
+  const venue=canonicalVenue(document.getElementById("eventVenueNew").value);
   const date=document.getElementById("eventDateNew").value;
   if(!name||!venue||!date){alert("イベント名・開催会場・開催日はすべて入力してください。");return;}
   if(editingEventId){
@@ -475,7 +565,7 @@ function editEvent(id){
   const e=events.find(x=>x.id===id);if(!e)return;
   editingEventId=id;
   document.getElementById("eventNameNew").value=e.name;
-  document.getElementById("eventVenueNew").value=e.venue;
+  document.getElementById("eventVenueNew").value=e.venue;syncPicker("eventVenueNew");
   document.getElementById("eventDateNew").value=e.date||"";
   setEventFormMode(true);
   document.getElementById("add-event").scrollIntoView({behavior:"smooth"});
@@ -491,20 +581,20 @@ function deleteEvent(id){
 }
 function addRestaurant(){
   const name=document.getElementById("newName").value.trim();
-  const venue=document.getElementById("newVenue").value.trim();
+  const venue=canonicalVenue(document.getElementById("newVenue").value);
   const genre=document.getElementById("newGenre").value.trim();
   const address=document.getElementById("newAddress").value.trim();
   const review=document.getElementById("newReview").value.trim();
   if(!name||!venue||!address){alert("お店の名前・会場・住所を入力してください。");return;}
   if(SHARED){guarded(async()=>{
     const id=await insertRemote("restaurants",{name:name.slice(0,50),venue:venue.slice(0,50),genre:(canonicalGenre(genre)||"未分類").slice(0,30),address:address.slice(0,100)});
-    if(review)await insertRemote("reviews",{restaurant_id:id,text:review.slice(0,500)});
+    if(review)await insertRemote("reviews",{restaurant_id:id,text:review.slice(0,500),tags:pickedTags("newTagPick")});
     await loadAll();["newName","newVenue","newGenre","newAddress","newReview"].forEach(i=>document.getElementById(i).value="");
-    alert("お店を追加しました！");});return;}
-  restaurants.push({id:uid("shop"),name,venue,genre:canonicalGenre(genre)||"未分類",address,reviews:review?[{id:uid("rv"),text:review,date:new Date().toISOString()}]:[]});
+    resetPickers();resetTags("newTagPick");alert("お店を追加しました！");});return;}
+  restaurants.push({id:uid("shop"),name,venue,genre:canonicalGenre(genre)||"未分類",address,reviews:review?[{id:uid("rv"),text:review,tags:pickedTags("newTagPick"),date:new Date().toISOString()}]:[]});
   saveRestaurants();showAllRestaurants();renderBrowseLists();
   ["newName","newVenue","newGenre","newAddress","newReview"].forEach(id=>document.getElementById(id).value="");
-  alert("お店を追加しました！");
+  resetPickers();resetTags("newTagPick");alert("お店を追加しました！");
 }
 function editRestaurant(id){
   const r=restaurants.find(x=>x.id===id);if(!r)return;
@@ -528,8 +618,8 @@ function refreshCurrentResults(){
   const venueText=document.getElementById("venueSearch").value.trim();
   const dateText=document.getElementById("dateSearch").value;
   const genreText=document.getElementById("genreSearch").value.trim();
-  const matches=events.filter(e=>(!eventText||e.name.includes(eventText))&&(!venueText||e.venue.includes(venueText))&&(!dateText||e.date===dateText));
-  visible=restaurants.filter(r=>(!venueText||r.venue.includes(venueText))&&(!genreText||genreMatches(r.genre,genreText))&&(!(eventText||dateText)||matches.some(e=>e.venue===r.venue)));
+  const matches=events.filter(e=>(!eventText||e.name.includes(eventText))&&(!venueText||venueMatches(e.venue,venueText))&&(!dateText||e.date===dateText));
+  visible=restaurants.filter(r=>(!venueText||venueMatches(r.venue,venueText))&&(!genreText||genreMatches(r.genre,genreText))&&(!(eventText||dateText)||matches.some(e=>e.venue===r.venue))&&tagsMatch(r,pickedTags("tagFilter")));
   renderRestaurants();
 }
 function latestReview(r){const l=r.reviews||[];return l.length?l[l.length-1].text:"";}
@@ -549,15 +639,16 @@ function renderDetail(){
   document.getElementById("detailBody").innerHTML=`
     <button class="close-x" onclick="closeDetail()" aria-label="閉じる">×</button>
     <h2>${escapeHTML(r.name)}</h2>
-    <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span></div>
+    <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span>${liveTagsHTML(r)}</div>
     <div class="meta">📍 ${escapeHTML(r.venue)} 周辺<br>${escapeHTML(r.address)}</div>
-    <div class="actions"><button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップで見る</button>${SHARED?`<button class="orange" onclick="reportItem('restaurants','${r.id}')">通報</button>`:""}</div>
+    <div class="actions"><button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップで見る</button>${SHARED?`<button class="secondary" onclick="shareShop('${r.id}')">Xで共有</button>`:""}${SHARED?`<button class="orange" onclick="reportItem('restaurants','${r.id}')">通報</button>`:""}</div>
     <h3>口コミ一覧（${list.length}件）</h3>
     <div class="review-list">${list.map(v=>`<div class="review">
       <div class="review-head"><span>${escapeHTML(fmtDate(v.date))}</span><span>${canDel(v.id)?`<button class="danger" onclick="deleteReview('${v.id}')">削除</button>`:""}${SHARED?` <button class="orange" onclick="reportItem('reviews','${v.id}')">通報</button>`:""}</span></div>
-      <p>${escapeHTML(v.text)}</p></div>`).join("")||'<p class="meta">口コミはまだありません。最初の口コミを書いてみよう！</p>'}</div>
+      <p>${escapeHTML(v.text)}</p>${(v.tags||[]).length?`<div class="tags">${v.tags.map(t=>`<span class="tag live">${escapeHTML(t)}</span>`).join("")}</div>`:""}</div>`).join("")||'<p class="meta">口コミはまだありません。最初の口コミを書いてみよう！</p>'}</div>
     <label for="detailReviewInput">口コミを書く</label>
     <textarea id="detailReviewInput" maxlength="500" rows="3" placeholder="ライブ前の食事におすすめ！"></textarea>
+    <div class="tag-label">ライブ向きタグ（任意）</div>${tagPickHTML("detailTagPick")}
     <button class="primary" onclick="addReview()">口コミを投稿する</button>
     <p class="form-note">${SAVE_NOTE}</p>`;
 }
@@ -566,9 +657,9 @@ function addReview(){
   const r=restaurants.find(x=>x.id===detailId);if(!r)return;
   const text=document.getElementById("detailReviewInput").value.trim();
   if(!text){alert("口コミを入力してください。");return;}
-  if(SHARED){guarded(async()=>{await insertRemote("reviews",{restaurant_id:r.id,text:text.slice(0,500)});await loadAll();});return;}
+  if(SHARED){guarded(async()=>{await insertRemote("reviews",{restaurant_id:r.id,text:text.slice(0,500),tags:pickedTags("detailTagPick")});await loadAll();});return;}
   r.reviews=r.reviews||[];
-  r.reviews.push({id:uid("rv"),text,date:new Date().toISOString()});
+  r.reviews.push({id:uid("rv"),text,tags:pickedTags("detailTagPick"),date:new Date().toISOString()});
   saveRestaurants();renderDetail();renderRestaurants();
 }
 function deleteReview(rid){
@@ -583,6 +674,9 @@ document.getElementById("detailDialog").addEventListener("click",e=>{if(e.target
 document.getElementById("detailDialog").addEventListener("close",()=>{detailId=null;});
 renderEvents();renderBrowseLists();renderRestaurants();
 document.querySelectorAll(".save-note").forEach(n=>n.textContent=SAVE_NOTE);
+initFolds();renderPickers();
+document.getElementById("newTagPick").outerHTML=tagPickHTML("newTagPick");
+document.getElementById("tagFilter").outerHTML=tagPickHTML("tagFilter");
 if(SHARED&&adminKey()){const f=document.querySelector("footer"),a=document.createElement("p");a.textContent="🔧 管理者モード";f.appendChild(a);}
 if(SHARED)loadAll().catch(e=>{console.error(e);alert("サーバーに接続できませんでした。\n\n【詳細】"+(e.detail||e.message));});
 </script>
