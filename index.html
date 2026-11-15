@@ -17,6 +17,15 @@
 <meta property="og:url" content="https://dragonsnake373-lab.github.io/meshi-mas/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%B4%3C/text%3E%3C/svg%3E">
 <script>(function(){try{var t=localStorage.getItem("mesimasu_theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+<script>/* 診断用：URLの末尾に #debug を付けて開く（または管理者モード）と、画面下にエラーが出る */
+(function(){
+  var show=false;try{show=location.hash.indexOf("debug")>=0||!!localStorage.getItem("mesimasu_admin");}catch(e){}
+  if(!show)return;
+  function bar(m){var d=document.getElementById("errbar");if(!d){d=document.createElement("div");d.id="errbar";d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#c9364c;color:#fff;padding:10px 14px;font:13px/1.5 sans-serif;white-space:pre-wrap";document.documentElement.appendChild(d);}d.textContent+=m+"\n";}
+  window.__dbg=bar;
+  window.addEventListener("error",function(e){bar("⚠ エラー: "+e.message+(e.lineno?"（"+e.lineno+"行目）":""));});
+  window.addEventListener("unhandledrejection",function(e){bar("⚠ 通信エラー: "+(e.reason&&(e.reason.detail||e.reason.message)||e.reason));});
+})();</script>
 <style>
 :root{
   --pink:#ff74b8;--coral:#f34f6d;--blue:#2681c8;--yellow:#ffc30b;
@@ -242,10 +251,8 @@ const EVENT_KEY="mesimasu_events_v1";
 let storageWarned=false;
 // ★ Supabase の Project URL と publishable key（sb_publishable_…）を貼ると共有モード。空のままなら端末内のみ保存
 // ※ secret key / service_role key は絶対に貼らないでください
-const SUPABASE_URL="https://gnuvwzqsvnxmrdzbfoti.supabase.co
-";
-const SUPABASE_ANON_KEY="sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA
-";
+const SUPABASE_URL="https://gnuvwzqsvnxmrdzbfoti.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA";
 const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
 const sampleEvents=[
   {id:"event-1",name:"ライブイベント A",venue:"東京ドーム",date:"2026-12-20"},
@@ -402,16 +409,34 @@ async function removeMine(table,id){
   await remote("rpc/delete_mine",{method:"POST",body:JSON.stringify({tbl:table,rid:id,token:t})});
   await loadAll();
 }
+// 口コミの読み込みに失敗しても（タグ列が未作成など）お店・イベントは表示する
+async function loadReviews(){
+  const q="&hidden=eq.false&order=created_at.asc&limit=5000";
+  try{return await remote("reviews?select=id,restaurant_id,text,tags,created_at"+q);}
+  catch(e){
+    console.error(e);
+    try{
+      const rv=await remote("reviews?select=id,restaurant_id,text,created_at"+q);
+      if(isAdmin())alert("口コミのタグを読み込めませんでした。supabase_tags_patch.sql を実行してください。\n\n【詳細】"+(e.detail||e.message));
+      return rv;
+    }catch(e2){
+      console.error(e2);
+      if(isAdmin())alert("口コミを読み込めませんでした。\n\n【詳細】"+(e2.detail||e2.message));
+      return [];
+    }
+  }
+}
 async function loadAll(){
-  const [ev,rs,rv]=await Promise.all([
+  const [ev,rs]=await Promise.all([
     remote("events?select=id,name,venue,date&hidden=eq.false&order=date.asc&limit=500"),
-    remote("restaurants?select=id,name,venue,genre,address&hidden=eq.false&order=created_at.desc&limit=1000"),
-    remote("reviews?select=id,restaurant_id,text,tags,created_at&hidden=eq.false&order=created_at.asc&limit=5000")]);
+    remote("restaurants?select=id,name,venue,genre,address&hidden=eq.false&order=created_at.desc&limit=1000")]);
+  const rv=await loadReviews();
   events=ev.map(e=>({...e,venue:canonicalVenue(e.venue)||e.venue}));
   restaurants=rs.map(r=>({...r,venue:canonicalVenue(r.venue)||r.venue,reviews:rv.filter(v=>v.restaurant_id===r.id).map(v=>({id:v.id,text:v.text,tags:v.tags||[],date:v.created_at}))}));
   renderEvents();renderBrowseLists();refreshCurrentResults();
   if(detailId)renderDetail();
   openFromHash();
+  if(window.__dbg)window.__dbg("読み込み完了：お店"+restaurants.length+"件 / イベント"+events.length+"件 / 接続先 "+SB_URL+" / 管理者"+(isAdmin()?"ON":"OFF"));
 }
 function reportItem(table,id){
   if(!confirm("この投稿を不適切として通報しますか？"))return;
