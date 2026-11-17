@@ -213,6 +213,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
     <a href="#" data-popup="events">イベントから</a>
     <a href="#" data-popup="venues">会場から</a>
     <a href="#" data-popup="genres">ジャンルから</a>
+    <a href="#" data-popup="walk">徒歩時間から</a>
     <a href="#restaurants">お店一覧</a>
     <a href="#add-restaurant">お店追加</a>
     <a href="#add-event">イベント追加</a>
@@ -231,7 +232,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
       <div class="fields">
         <div><label for="eventSearch">ライブ・イベント</label><select id="eventSearch"><option value="">すべてのイベント</option></select></div>
         <div><label for="areaSearch">エリア</label><select id="areaSearch"><option value="">すべてのエリア</option></select><input id="venueSearch" type="hidden"></div>
-        <div><label for="dateSearch">開催日</label><input id="dateSearch" type="date"></div>
+        <div><label for="walkSearch">会場から徒歩</label><select id="walkSearch"><option value="">指定なし</option><option value="5">5分以内</option><option value="10">10分以内</option><option value="15">15分以内</option><option value="30">30分以内</option></select></div>
         <div><label for="genreSearch">料理ジャンル</label><select id="genreSearch"><option value="">すべてのジャンル</option></select></div>
       </div>
       <div class="tag-label">ライブ向きタグで絞り込み</div><div id="tagFilter"></div>
@@ -273,6 +274,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
       <div><label for="newVenue">近くのライブ会場</label><select class="picker" data-for="newVenue" data-kind="venue"></select><input id="newVenue" maxlength="50" placeholder="会場名を入力" hidden></div>
       <div><label for="newGenre">料理ジャンル</label><select class="picker" data-for="newGenre" data-kind="genre"></select><input id="newGenre" maxlength="30" placeholder="ジャンルを入力" hidden></div>
       <div><label for="newAddress">住所</label><input id="newAddress" maxlength="100" placeholder="お店の住所"></div>
+      <div><label for="newWalk">会場から徒歩（分）</label><input id="newWalk" type="number" min="1" max="120" inputmode="numeric" placeholder="例：7（わかる範囲で）"></div>
     </div>
     <label for="newReview" style="margin-top:16px">口コミ・おすすめポイント</label>
     <textarea id="newReview" maxlength="500" rows="3" placeholder="ライブ前の食事におすすめ！"></textarea>
@@ -296,6 +298,10 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
     </div>
     <p class="form-note save-note"></p>
   </section>
+<dialog class="popup" id="popup-walk"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
+    <div class="section-head"><div><h2>徒歩時間から探す</h2><div class="sub">会場からお店までの徒歩時間で探せます。徒歩時間が登録されているお店が対象です。</div></div></div>
+    <div class="browse-grid" id="walkList"></div>
+  </div></dialog>
 <dialog class="popup" id="popup-dashboard"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
     <div class="section-head"><div><h2>ダッシュボード</h2><div class="sub">管理者だけに表示されます（管理者自身のアクセスは集計されません）。</div></div></div>
     <div id="dashBody"></div>
@@ -320,7 +326,7 @@ let storageWarned=false;
 // ★ Supabase の Project URL と publishable key（sb_publishable_…）を貼ると共有モード。空のままなら端末内のみ保存
 // ※ secret key / service_role key は絶対に貼らないでください
 const SUPABASE_URL="https://gnuvwzqsvnxmrdzbfoti.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA";
+const SUPABASE_ANON_KEY=""sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA";
 const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
 const sampleEvents=[
   {id:"event-1",name:"ライブイベント A",venue:"東京ドーム",date:"2026-12-20"},
@@ -513,10 +519,20 @@ async function loadReviews(){
     }
   }
 }
+async function loadRestaurants(){
+  const q="&hidden=eq.false&order=created_at.desc&limit=1000";
+  try{return await remote("restaurants?select=id,name,venue,genre,address,walk_min"+q);}
+  catch(e){
+    console.error(e);
+    const r=await remote("restaurants?select=id,name,venue,genre,address"+q);
+    if(isAdmin())alert("徒歩時間の列を読み込めませんでした。supabase_v16_patch.sql を実行してください。\n\n【詳細】"+(e.detail||e.message));
+    return r;
+  }
+}
 async function loadAll(){
   const [ev,rs]=await Promise.all([
     remote("events?select=id,name,venue,date&hidden=eq.false&order=date.asc&limit=500"),
-    remote("restaurants?select=id,name,venue,genre,address&hidden=eq.false&order=created_at.desc&limit=1000")]);
+    loadRestaurants()]);
   const rv=await loadReviews();
   events=ev.map(e=>({...e,venue:canonicalVenue(e.venue)||e.venue}));
   restaurants=rs.map(r=>({...r,venue:canonicalVenue(r.venue)||r.venue,reviews:rv.filter(v=>v.restaurant_id===r.id).map(v=>({id:v.id,text:v.text,tags:v.tags||[],date:v.created_at}))}));
@@ -621,12 +637,7 @@ function renderAreaOptions(){
   sel.innerHTML='<option value="">すべてのエリア</option>'+AREA_ORDER.filter(a=>a in cnt).map(a=>`<option value="${escapeHTML(a)}">${escapeHTML(a)}（${cnt[a]}店舗）</option>`).join("");
   sel.value=cur;
 }
-function browseArea(encoded){
-  closePopups();
-  ["eventSearch","venueSearch","dateSearch","genreSearch"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("areaSearch").value=decodeURIComponent(encoded);
-  searchRestaurants();
-}
+function browseArea(encoded){closePopups();setFilters({areaSearch:decodeURIComponent(encoded)});searchRestaurants();}
 // 検索ボタン：会場・イベントのカードで設定した会場の絞り込みは解除し、画面の入力内容で検索
 function searchFromForm(){document.getElementById("venueSearch").value="";searchRestaurants();}
 function pickerOptionsHTML(kind){
@@ -674,7 +685,7 @@ function renderEvents(){renderEventOptions();
     <article class="event"><small>${escapeHTML(e.date||"開催日未設定")}</small>
     <h3>${escapeHTML(e.name)}</h3><p>📍 ${escapeHTML(e.venue)}</p>
     <div class="actions">
-      <button class="view-btn" onclick="selectEvent('${e.id}')">周辺のお店を見る →</button>
+      <button class="view-btn" onclick="selectEvent('${e.id}')">このエリアのお店を見る →</button>
       ${!canEdit()?"":`<button class="green" onclick="editEvent('${e.id}')">編集</button>`}
       ${canDel(e.id)?`<button class="danger" onclick="deleteEvent('${e.id}')">削除</button>`:""}${SHARED?`<button class="orange" onclick="reportItem('events','${e.id}')">通報</button>`:""}
     </div></article>`).join(""):"<p>イベントはまだ登録されていません。</p>";
@@ -699,13 +710,13 @@ function renderBrowseLists(){
       <span class="browse-icon">🍴</span><span class="browse-name">${escapeHTML(g)}</span>
       <span class="browse-count">${restaurants.filter(r=>genreKey(canonicalGenre(r.genre))===genreKey(g)).length}店舗 →</span>
     </button>`).join("")||"<p>ジャンルはまだ登録されていません。</p>";
-  renderGenreOptions();renderPickers();renderAreaOptions();renderGenreSelect();
+  renderGenreOptions();renderPickers();renderAreaOptions();renderGenreSelect();renderWalkList();
 }
 function renderRestaurants(){
   document.getElementById("restaurantList").innerHTML=visible.map(r=>`
     <article class="restaurant" tabindex="0" role="button" onclick="openDetail('${r.id}')" onkeydown="if(event.key==='Enter'&&event.target===this)openDetail('${r.id}')">
     <div class="info"><h3>${escapeHTML(r.name)}</h3>
-    <div class="meta">📍 ${escapeHTML(r.venue)} 周辺<br>${escapeHTML(r.address)}</div>
+    <div class="meta">📍 ${escapeHTML(r.venue)} 周辺${r.walk_min?`・🚶徒歩${r.walk_min}分`:""}<br>${escapeHTML(r.address)}</div>
     <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span>${liveTagsHTML(r)}</div>
     <p class="meta">${escapeHTML(latestReview(r)||"口コミはまだありません。")}</p>
     <div class="actions" onclick="event.stopPropagation()">
@@ -720,56 +731,39 @@ function renderRestaurants(){
 }
 function selectEvent(id){closePopups();
   const e=events.find(x=>x.id===id);if(!e)return;
-  document.getElementById("areaSearch").value="";
-  document.getElementById("eventSearch").value=e.name;
-  document.getElementById("venueSearch").value=e.venue;
-  document.getElementById("dateSearch").value=e.date||"";
-  document.getElementById("genreSearch").value="";
+  setFilters({eventSearch:e.name});
   searchRestaurants();
 }
-function browseVenue(encoded){
-  closePopups();
-  document.getElementById("areaSearch").value="";
-  document.getElementById("eventSearch").value="";
-  document.getElementById("venueSearch").value=decodeURIComponent(encoded);
-  document.getElementById("dateSearch").value="";
-  document.getElementById("genreSearch").value="";
-  searchRestaurants();
+function setFilters(v){["eventSearch","venueSearch","areaSearch","genreSearch","walkSearch"].forEach(i=>document.getElementById(i).value=v[i]||"");}
+function browseWalk(n){closePopups();setFilters({walkSearch:String(n)});searchRestaurants();}
+function renderWalkList(){
+  const has=restaurants.some(r=>r.walk_min!=null);
+  document.getElementById("walkList").innerHTML=[5,10,15,30].map(n=>`<button class="browse-card" onclick="browseWalk(${n})"><span class="browse-icon">🚶</span><span class="browse-name">会場から徒歩${n}分以内</span><span class="browse-count">${restaurants.filter(r=>r.walk_min!=null&&Number(r.walk_min)<=n).length}店舗 →</span></button>`).join("")+(has?"":"<p>徒歩時間が登録されたお店はまだありません。</p>");
 }
-function browseGenre(encoded){
-  closePopups();
-  document.getElementById("areaSearch").value="";
-  document.getElementById("eventSearch").value="";
-  document.getElementById("venueSearch").value="";
-  document.getElementById("dateSearch").value="";
-  document.getElementById("genreSearch").value=decodeURIComponent(encoded);
-  searchRestaurants();
-}
-function searchRestaurants(){
-  const eventText=document.getElementById("eventSearch").value.trim();
-  const venueText=document.getElementById("venueSearch").value.trim();
-  const areaText=document.getElementById("areaSearch").value;
-  const dateText=document.getElementById("dateSearch").value;
-  const genreText=document.getElementById("genreSearch").value.trim();
-  const matchingEvents=events.filter(e=>
-    (!eventText||e.name.includes(eventText))&&
-    (!venueText||venueMatches(e.venue,venueText))&&(!areaText||areaOf(e.venue)===areaText)&&
-    (!dateText||e.date===dateText)
-  );
-  const eventActive=!!(eventText||dateText);
+function browseVenue(encoded){closePopups();setFilters({venueSearch:decodeURIComponent(encoded)});searchRestaurants();}
+function browseGenre(encoded){closePopups();setFilters({genreSearch:decodeURIComponent(encoded)});searchRestaurants();}
+function applyFilters(){
+  const g=id=>document.getElementById(id).value.trim();
+  const eventText=g("eventSearch"),venueText=g("venueSearch"),areaText=g("areaSearch"),genreText=g("genreSearch"),walkText=g("walkSearch");
+  const tagSel=pickedTags("tagFilter");
+  const matchingEvents=events.filter(e=>(!eventText||e.name===eventText)&&(!venueText||venueMatches(e.venue,venueText))&&(!areaText||areaOf(e.venue)===areaText));
   visible=restaurants.filter(r=>
     (!venueText||venueMatches(r.venue,venueText))&&(!areaText||areaOf(r.venue)===areaText)&&
     (!genreText||genreMatches(r.genre,genreText))&&
-    (!eventActive||matchingEvents.some(e=>e.venue===r.venue))&&
-    tagsMatch(r,pickedTags("tagFilter"))
-  );
-  const terms=[eventText,areaText,venueText,dateText,genreText,...pickedTags("tagFilter")].filter(Boolean);
+    (!walkText||(r.walk_min!=null&&Number(r.walk_min)<=Number(walkText)))&&
+    (!eventText||matchingEvents.some(e=>areaOf(e.venue)===areaOf(r.venue)))&&
+    tagsMatch(r,tagSel));
+  const evAreas=eventText?[...new Set(matchingEvents.map(e=>areaOf(e.venue)))]:[];
+  return [eventText,evAreas.length?evAreas.join("・")+"エリア":"",areaText,venueText,genreText,walkText?"徒歩"+walkText+"分以内":"",...tagSel].filter(Boolean);
+}
+function searchRestaurants(){
+  const terms=applyFilters();
   document.getElementById("resultDescription").textContent=terms.length?terms.join(" / ")+" の検索結果":"すべてのお店";
   renderRestaurants();
   document.getElementById("restaurants").scrollIntoView({behavior:"smooth"});
 }
 function showAllRestaurants(){
-  ["eventSearch","venueSearch","areaSearch","dateSearch","genreSearch"].forEach(id=>document.getElementById(id).value="");
+  setFilters({});
   visible=[...restaurants];
   document.getElementById("resultDescription").textContent="すべてのお店";
   renderRestaurants();
@@ -823,16 +817,19 @@ function addRestaurant(){
   const venue=canonicalVenue(document.getElementById("newVenue").value);
   const genre=document.getElementById("newGenre").value.trim();
   const address=document.getElementById("newAddress").value.trim();
+  const walkRaw=document.getElementById("newWalk").value.trim();
+  const walk=walkRaw===""?null:Math.round(Number(walkRaw));
+  if(walk!==null&&!(walk>=1&&walk<=120)){alert("徒歩は1〜120分の数字で入力してください。");return;}
   const review=document.getElementById("newReview").value.trim();
   if(!name||!venue||!address){alert("お店の名前・会場・住所を入力してください。");return;}
   if(SHARED){guarded(async()=>{
-    const id=await insertRemote("restaurants",{name:name.slice(0,50),venue:venue.slice(0,50),genre:(canonicalGenre(genre)||"未分類").slice(0,30),address:address.slice(0,100)});
+    const id=await insertRemote("restaurants",{name:name.slice(0,50),venue:venue.slice(0,50),genre:(canonicalGenre(genre)||"未分類").slice(0,30),address:address.slice(0,100),...(walk?{walk_min:walk}:{})});
     if(review)await insertRemote("reviews",{restaurant_id:id,text:review.slice(0,500),tags:pickedTags("newTagPick")});
-    await loadAll();["newName","newVenue","newGenre","newAddress","newReview"].forEach(i=>document.getElementById(i).value="");
+    await loadAll();["newName","newVenue","newGenre","newAddress","newWalk","newReview"].forEach(i=>document.getElementById(i).value="");
     resetPickers();resetTags("newTagPick");alert("お店を追加しました！");});return;}
-  restaurants.push({id:uid("shop"),name,venue,genre:canonicalGenre(genre)||"未分類",address,reviews:review?[{id:uid("rv"),text:review,tags:pickedTags("newTagPick"),date:new Date().toISOString()}]:[]});
+  restaurants.push({id:uid("shop"),name,venue,genre:canonicalGenre(genre)||"未分類",address,walk_min:walk,reviews:review?[{id:uid("rv"),text:review,tags:pickedTags("newTagPick"),date:new Date().toISOString()}]:[]});
   saveRestaurants();showAllRestaurants();renderBrowseLists();
-  ["newName","newVenue","newGenre","newAddress","newReview"].forEach(id=>document.getElementById(id).value="");
+  ["newName","newVenue","newGenre","newAddress","newWalk","newReview"].forEach(id=>document.getElementById(id).value="");
   resetPickers();resetTags("newTagPick");alert("お店を追加しました！");
 }
 function editRestaurant(id){
@@ -841,9 +838,11 @@ function editRestaurant(id){
   const venue=prompt("近くのライブ会場",r.venue);if(venue===null)return;
   const genre=prompt("料理ジャンル",r.genre||"");if(genre===null)return;
   const address=prompt("住所",r.address);if(address===null)return;
+  const walkIn=prompt("会場から徒歩（分）※空欄で未設定",r.walk_min??"");if(walkIn===null)return;
+  let walk=null;if(walkIn.trim()!==""){walk=Math.round(Number(walkIn));if(!(walk>=1&&walk<=120)){alert("徒歩は1〜120分の数字で入力してください。");return;}}
   if(!name.trim()||!venue.trim()||!address.trim()){alert("お店の名前・会場・住所は必須です。");return;}
-  if(SHARED){guarded(async()=>{await adminRpc("admin_update_restaurant",{rid:id,p_name:name.trim().slice(0,50),p_venue:(canonicalVenue(venue)||venue.trim()).slice(0,50),p_genre:(canonicalGenre(genre)||"未分類").slice(0,30),p_address:address.trim().slice(0,100)});await loadAll();alert("お店情報を更新しました。");});return;}
-  Object.assign(r,{name:name.trim().slice(0,50),venue:venue.trim().slice(0,50),genre:canonicalGenre(genre).slice(0,30)||"未分類",address:address.trim().slice(0,100)});
+  if(SHARED){guarded(async()=>{await adminRpc("admin_update_restaurant",{rid:id,p_name:name.trim().slice(0,50),p_venue:(canonicalVenue(venue)||venue.trim()).slice(0,50),p_genre:(canonicalGenre(genre)||"未分類").slice(0,30),p_address:address.trim().slice(0,100),p_walk:walk});await loadAll();alert("お店情報を更新しました。");});return;}
+  Object.assign(r,{name:name.trim().slice(0,50),venue:venue.trim().slice(0,50),genre:canonicalGenre(genre).slice(0,30)||"未分類",address:address.trim().slice(0,100),walk_min:walk});
   saveRestaurants();refreshCurrentResults();renderBrowseLists();alert("お店情報を更新しました。");
 }
 function deleteRestaurant(id){
@@ -853,16 +852,7 @@ function deleteRestaurant(id){
   restaurants=restaurants.filter(x=>x.id!==id);
   saveRestaurants();refreshCurrentResults();renderBrowseLists();
 }
-function refreshCurrentResults(){
-  const eventText=document.getElementById("eventSearch").value.trim();
-  const venueText=document.getElementById("venueSearch").value.trim();
-  const areaText=document.getElementById("areaSearch").value;
-  const dateText=document.getElementById("dateSearch").value;
-  const genreText=document.getElementById("genreSearch").value.trim();
-  const matches=events.filter(e=>(!eventText||e.name.includes(eventText))&&(!venueText||venueMatches(e.venue,venueText))&&(!areaText||areaOf(e.venue)===areaText)&&(!dateText||e.date===dateText));
-  visible=restaurants.filter(r=>(!venueText||venueMatches(r.venue,venueText))&&(!areaText||areaOf(r.venue)===areaText)&&(!genreText||genreMatches(r.genre,genreText))&&(!(eventText||dateText)||matches.some(e=>e.venue===r.venue))&&tagsMatch(r,pickedTags("tagFilter")));
-  renderRestaurants();
-}
+function refreshCurrentResults(){applyFilters();renderRestaurants();}
 function latestReview(r){const l=r.reviews||[];return l.length?l[l.length-1].text:"";}
 function fmtDate(d){return d?new Date(d).toLocaleString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"投稿日不明";}
 let detailId=null;
@@ -882,7 +872,7 @@ function renderDetail(){
     <button class="close-x" onclick="closeDetail()" aria-label="閉じる">×</button>
     <h2>${escapeHTML(r.name)}</h2>
     <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span>${liveTagsHTML(r)}</div>
-    <div class="meta">📍 ${escapeHTML(r.venue)} 周辺<br>${escapeHTML(r.address)}</div>
+    <div class="meta">📍 ${escapeHTML(r.venue)} 周辺${r.walk_min?`・🚶徒歩${r.walk_min}分`:""}<br>${escapeHTML(r.address)}</div>
     <div class="actions"><button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップで見る</button>${SHARED?`<button class="secondary" onclick="shareShop('${r.id}')">Xで共有</button>`:""}${SHARED?`<button class="orange" onclick="reportItem('restaurants','${r.id}')">通報</button>`:""}</div>
     <h3>口コミ一覧（${list.length}件）</h3>
     <div class="review-list">${list.map(v=>`<div class="review">
