@@ -16,13 +16,13 @@
 <meta name="twitter:image" content="https://dragonsnake373-lab.github.io/meshi-mas/ogp.png?v=1">
 <meta property="og:url" content="https://dragonsnake373-lab.github.io/meshi-mas/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%B4%3C/text%3E%3C/svg%3E">
-<script>(function(){try{var t=localStorage.getItem("mesimasu_theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=t;}catch(e){}})();</script>
-<script>/* 診断用：URLの末尾に #debug を付けて開く（または管理者モード）と、画面下にエラーが出る */
+<script>(function(){try{var t=localStorage.getItem("mesimasu_theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"765as");if(",dark,light,765as,cinderella,million,sidem,shiny,gakumas,vivala,".indexOf(","+t+",")<0)t="765as";document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+<script>/* 診断用：管理者モードではエラー時のみ、URL末尾に #debug を付けると読み込み状況も、画面下に表示 */
 (function(){
   var show=false;try{show=location.hash.indexOf("debug")>=0||!!localStorage.getItem("mesimasu_admin");}catch(e){}
   if(!show)return;
   function bar(m){var d=document.getElementById("errbar");if(!d){d=document.createElement("div");d.id="errbar";d.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#c9364c;color:#fff;padding:10px 14px;font:13px/1.5 sans-serif;white-space:pre-wrap";document.documentElement.appendChild(d);}d.textContent+=m+"\n";}
-  window.__dbg=bar;
+  window.__dbg=location.hash.indexOf("debug")>=0?bar:null;
   window.addEventListener("error",function(e){bar("⚠ エラー: "+e.message+(e.lineno?"（"+e.lineno+"行目）":""));});
   window.addEventListener("unhandledrejection",function(e){bar("⚠ 通信エラー: "+(e.reason&&(e.reason.detail||e.reason.message)||e.reason));});
 })();</script>
@@ -36,24 +36,24 @@
 html{scroll-behavior:smooth}
 body{margin:0;font-family:"Noto Sans JP","Yu Gothic",Meiryo,sans-serif;color:var(--ink);background:var(--bg);font-size:17px;line-height:1.65}
 header{min-height:76px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;padding:12px 6%;border-bottom:1px solid var(--line);gap:20px}
-.logo{font-size:30px;font-weight:900;color:var(--coral);letter-spacing:1px;white-space:nowrap}
+.logo{font-size:30px;font-weight:900;color:var(--accent-text);letter-spacing:1px;white-space:nowrap}
 nav{display:flex;gap:18px;flex-wrap:wrap;font-size:15px;font-weight:700}
 nav a{color:var(--ink);text-decoration:none}
-nav a:hover{color:var(--coral)}
-.hero{padding:56px 7% 65px;background:linear-gradient(115deg,#ffe5f1,#fff0e8 55%,#e9f4ff)}
+nav a:hover{color:var(--accent-text)}
+.hero{padding:56px 7% 65px;background:linear-gradient(115deg,var(--hero1),var(--hero2) 55%,var(--hero3))}
 .hero-inner{max-width:1120px;margin:auto}
-.eyebrow{color:var(--coral);font-weight:800;font-size:15px;letter-spacing:1.5px}
+.eyebrow{color:var(--accent-text);font-weight:800;font-size:15px;letter-spacing:1.5px}
 h1{font-size:clamp(34px,5vw,54px);line-height:1.2;margin:12px 0 8px;white-space:nowrap}
-h1 span{color:var(--coral)}
+h1 span{color:var(--accent-text)}
 .tagline{font-size:15px;color:var(--gray);margin:12px 0 0}
 .search{background:var(--surface);padding:24px;border-radius:20px;box-shadow:0 10px 35px #b84d7c18;margin-top:28px}
 .fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 label{display:block;font-size:15px;font-weight:800;margin-bottom:7px}
 input,select,textarea{width:100%;border:1px solid var(--fline);border-radius:11px;padding:14px;font-size:16px;background:var(--surface);color:var(--ink);font-family:inherit}
-input:focus,select:focus,textarea:focus{outline:3px solid #ff74b833;border-color:var(--pink)}
+input:focus,select:focus,textarea:focus{outline:3px solid color-mix(in srgb,var(--coral) 28%,transparent);border-color:var(--coral)}
 button{cursor:pointer;border:0;border-radius:11px;padding:13px 18px;font-weight:800;font-size:15px;font-family:inherit;transition:filter .15s,transform .15s}
 button:hover{filter:brightness(.97);transform:translateY(-1px)}
-.primary{background:var(--coral);color:white}
+.primary{background:var(--coral);color:var(--on-accent)}
 .search button{width:100%;margin-top:17px;padding:15px}
 main{max-width:1160px;margin:52px auto;padding:0 24px}
 .section{margin-bottom:55px}
@@ -63,12 +63,12 @@ h3{font-size:20px}
 .sub{font-size:15px;color:var(--muted);margin-top:7px}
 .events,.browse-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
 .event,.browse-card{background:var(--surface);border:1px solid var(--line);padding:21px;border-radius:16px;box-shadow:0 4px 15px #33333308}
-.event small{color:var(--coral);font-weight:800;font-size:14px}
+.event small{color:var(--accent-text);font-weight:800;font-size:14px}
 .event h3{margin:9px 0;font-size:19px}
 .event p{font-size:15px;color:var(--muted);margin:5px 0 14px}
-.event .view-btn{background:#ffe5ef;color:#c93661}
+.event .view-btn{background:var(--accent-soft);color:var(--accent-ink)}
 .event .actions{margin-top:4px}
-.add-section.editing{border-color:var(--pink);box-shadow:0 0 0 3px #ff74b822}
+.add-section.editing{border-color:var(--coral);box-shadow:0 0 0 3px color-mix(in srgb,var(--coral) 18%,transparent)}
 .form-actions{display:flex;gap:10px;flex-wrap:wrap}
 .browse-card{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;width:100%;color:var(--ink);font-size:18px}
 .browse-card .browse-icon{font-size:27px}
@@ -80,7 +80,7 @@ h3{font-size:20px}
 .restaurant{background:var(--surface);border-radius:17px;overflow:hidden;border:1px solid var(--line);box-shadow:0 5px 18px #33333309}
 .restaurant{cursor:pointer;transition:box-shadow .15s,transform .15s}
 .restaurant:hover,.restaurant:focus-visible{box-shadow:0 8px 24px #b84d7c22;transform:translateY(-2px);outline:none}
-.more{font-size:13px;font-weight:800;color:var(--coral);margin-top:10px}
+.more{font-size:13px;font-weight:800;color:var(--accent-text);margin-top:10px}
 dialog#detailDialog{border:0;border-radius:20px;padding:0;width:calc(100% - 32px);max-width:640px;max-height:88vh;color:var(--ink);box-shadow:0 20px 60px #0004}
 dialog#detailDialog::backdrop{background:#303440aa}
 .dlg{padding:28px;position:relative}
@@ -123,7 +123,7 @@ footer .logo{color:#fff}
  .search{padding:18px}
 }
 [hidden]{display:none!important}
-.fold{width:42px;height:42px;padding:0;border-radius:50%;background:var(--surface);border:1px solid var(--line);color:var(--coral);font-size:16px;flex:none}
+.fold{width:42px;height:42px;padding:0;border-radius:50%;background:var(--surface);border:1px solid var(--line);color:var(--accent-text);font-size:16px;flex:none}
 .picker{margin-bottom:8px}
 .tag-label{font-weight:800;font-size:14px;margin:14px 0 8px}
 .chip{display:inline-block;position:relative;margin:0 8px 8px 0;font-size:14px;font-weight:600}
@@ -145,56 +145,116 @@ dialog#detailDialog{background:var(--surface)}
 [data-theme="dark"] .event .view-btn{background:#4a1f33;color:#ff8fb8}
 [data-theme="dark"] .close-x{background:#2c3040}
 [data-theme="dark"] footer{background:#0f1117}
+.area-group{margin-bottom:28px}
+.area-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.area-head h3{font-size:20px;margin:0}
+.area-head button{padding:8px 14px;font-size:13px}
+/* ===== テーマ（配色）===== */
+:root{--accent-text:#f34f6d;--on-accent:#fff;
+ --accent-soft:color-mix(in srgb,var(--coral) 14%,#fff);--accent-ink:color-mix(in srgb,var(--accent-text) 85%,#000);
+ --bg:color-mix(in srgb,var(--coral) 5%,#fff);--line:color-mix(in srgb,var(--coral) 16%,#fff);--fline:color-mix(in srgb,var(--coral) 18%,#fff);--soft:color-mix(in srgb,var(--coral) 6%,#fff);
+ --hero1:color-mix(in srgb,var(--coral) 17%,#fff);--hero2:color-mix(in srgb,var(--coral) 6%,#fff);--hero3:color-mix(in srgb,var(--coral) 10%,#e9f4ff)}
+:root[data-theme="light"]{--coral:#303440;--accent-text:#303440;--bg:#f6f7f9;--line:#e3e6ec;--fline:#d9dde5;--soft:#f3f4f7;--hero1:#fff;--hero2:#f3f4f7;--hero3:#e8edf5}
+:root[data-theme="765as"]{--coral:#f34f6d}
+:root[data-theme="cinderella"]{--coral:#2681c8;--accent-text:#2681c8}
+:root[data-theme="million"]{--coral:#ffc30b;--accent-text:#a87800;--on-accent:#3a2a00}
+:root[data-theme="sidem"]{--coral:#0fbe94;--accent-text:#08876a;--on-accent:#04372b}
+:root[data-theme="shiny"]{--coral:#8dbbff;--accent-text:#4a7bc8;--on-accent:#0b2a52}
+:root[data-theme="gakumas"]{--coral:#f39800;--accent-text:#b86e00;--on-accent:#3b2400}
+:root[data-theme="vivala"]{--coral:#656a75;--accent-text:#656a75}
+/* ===== ハンバーガーメニュー ===== */
+html{scroll-padding-top:84px}
+header{position:sticky;top:0;z-index:50;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px}
+.menu-btn{width:44px;height:44px;padding:0;font-size:22px;line-height:1;background:var(--soft);color:var(--ink);border:1px solid var(--line);flex:none}
+.drawer-backdrop{position:fixed;inset:0;background:#0007;opacity:0;pointer-events:none;transition:opacity .25s;z-index:998}
+.drawer-backdrop.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(330px,86vw);background:var(--surface);color:var(--ink);z-index:999;overflow-y:auto;padding:20px 22px 30px;box-shadow:6px 0 30px #0004;transform:translateX(-102%);visibility:hidden;transition:transform .25s,visibility 0s .25s}
+.drawer.open{transform:none;visibility:visible;transition:transform .25s}
+body.menu-open{overflow:hidden}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:20px}
+.drawer-close{width:40px;height:40px;padding:0;font-size:22px;background:var(--soft);color:var(--ink)}
+.drawer h4{margin:22px 0 10px;font-size:14px;color:var(--muted);letter-spacing:1px}
+.drawer-nav{flex-direction:column;gap:0}
+.drawer-nav a{padding:13px 6px;border-bottom:1px solid var(--line);font-size:17px}
+.theme-list{display:grid;gap:8px}
+.theme-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;background:var(--soft);border:2px solid transparent;color:var(--ink);font-size:16px}
+.theme-opt .sw{width:26px;height:26px;border-radius:50%;border:1px solid #0003;flex:none}
+.theme-opt[aria-pressed="true"]{border-color:var(--coral)}
+.theme-opt[aria-pressed="true"]::after{content:"✓";margin-left:auto;font-weight:900;color:var(--accent-text)}
+h1 ruby,footer ruby{ruby-position:over;ruby-align:center}
+h1 rt{font-size:max(.34em,12px);font-weight:800;letter-spacing:.02em}
+h1{padding-top:.25em}
+footer rt{font-size:.6em}
+dialog.popup{border:0;border-radius:20px;padding:0;width:calc(100% - 32px);max-width:920px;max-height:88vh;color:var(--ink);background:var(--surface);box-shadow:0 20px 60px #0004}
+dialog.popup::backdrop{background:#303440aa}
+dialog.popup .section-head{padding-right:48px;margin-bottom:18px}
+.search-fab{margin-left:auto;width:44px;height:44px;padding:0;border-radius:50%;font-size:20px;line-height:1;background:var(--coral);color:var(--on-accent);flex:none}
+.stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
+.stat{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:18px}
+.stat-v{font-size:34px;font-weight:900;color:var(--accent-text);line-height:1.2}
+.stat-l{font-size:14px;color:var(--muted);margin-top:4px}
+footer a{color:#fff;text-decoration:underline}
+footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-height:1.6}
+.form-note a{color:var(--accent-text)}
 </style>
 </head>
 <body>
 <datalist id="genreOptions"></datalist>
 <header>
+  <button class="menu-btn" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="drawer">☰</button>
   <div class="logo">めしマス.</div>
-  <nav>
-    <a href="#events">イベントから</a>
-    <a href="#venues">会場から</a>
-    <a href="#genres">ジャンルから</a>
+  <button class="search-fab" id="toSearch" type="button" aria-label="検索欄に戻る">🔍</button>
+</header>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer" aria-label="メニュー" aria-hidden="true">
+  <div class="drawer-head"><strong>メニュー</strong><button class="drawer-close" id="drawerClose" type="button" aria-label="閉じる">×</button></div>
+  <h4>カテゴリ</h4>
+  <nav class="drawer-nav">
+    <a href="#" data-popup="events">イベントから</a>
+    <a href="#" data-popup="venues">会場から</a>
+    <a href="#" data-popup="genres">ジャンルから</a>
     <a href="#restaurants">お店一覧</a>
     <a href="#add-restaurant">お店追加</a>
     <a href="#add-event">イベント追加</a>
-    <button class="theme-btn" id="themeBtn" type="button" aria-label="ダークモード切替">🌙 ダーク</button>
+    <a href="#" data-popup="dashboard" id="dashLink" hidden>📊 ダッシュボード</a>
   </nav>
-</header>
+  <h4>テーマカラー</h4>
+  <div class="theme-list" id="themeList"></div>
+</aside>
 
 <section class="hero">
   <div class="hero-inner">
     <div class="eyebrow">LIVE × GOURMET × DISCOVERY</div>
-    <h1><span>現地(ここ)で、何食べる？</span></h1>
+    <h1><span><ruby>現地<rt>ここ</rt></ruby>で、何食べる？</span></h1>
     <p class="tagline">ライブの日のごはん探しを、もっと楽しく。</p>
     <div class="search">
       <div class="fields">
-        <div><label for="eventSearch">ライブ・イベント名</label><input id="eventSearch" placeholder="例：アイドルマスター"></div>
-        <div><label for="venueSearch">ライブ会場</label><input id="venueSearch" placeholder="例：東京ドーム"></div>
+        <div><label for="eventSearch">ライブ・イベント</label><select id="eventSearch"><option value="">すべてのイベント</option></select></div>
+        <div><label for="areaSearch">エリア</label><select id="areaSearch"><option value="">すべてのエリア</option></select><input id="venueSearch" type="hidden"></div>
         <div><label for="dateSearch">開催日</label><input id="dateSearch" type="date"></div>
         <div><label for="genreSearch">料理ジャンル</label><input id="genreSearch" list="genreOptions" placeholder="例：ラーメン、カフェ"></div>
       </div>
       <div class="tag-label">ライブ向きタグで絞り込み</div><div id="tagFilter"></div>
-      <button class="primary" onclick="searchRestaurants()">この条件でお店を探す →</button>
+      <button class="primary" onclick="searchFromForm()">この条件でお店を探す →</button>
     </div>
   </div>
 </section>
 
 <main>
-  <section id="events" class="section">
+  <dialog class="popup" id="popup-events"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
     <div class="section-head"><div><h2>イベントから探す</h2><div class="sub">参加するイベントを選んで、会場周辺のお店をチェック。</div></div></div>
     <div class="events" id="eventList"></div>
-  </section>
+  </div></dialog>
 
-  <section id="venues" class="section">
+  <dialog class="popup" id="popup-venues"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
     <div class="section-head"><div><h2>会場から探す</h2><div class="sub">ライブ会場を選んで、近くのお店をまとめて探そう。</div></div></div>
-    <div class="browse-grid" id="venueList"></div>
-  </section>
+    <div id="venueList"></div>
+  </div></dialog>
 
-  <section id="genres" class="section">
+  <dialog class="popup" id="popup-genres"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
     <div class="section-head"><div><h2>ジャンルから探す</h2><div class="sub">食べたい料理のジャンルからお店を探そう。</div></div></div>
     <div class="browse-grid" id="genreList"></div>
-  </section>
+  </div></dialog>
 
   <section id="restaurants" class="section">
     <div class="section-head">
@@ -219,6 +279,7 @@ dialog#detailDialog{background:var(--surface)}
     <div class="tag-label">ライブ向きタグ（任意・複数選択可）</div><div id="newTagPick"></div>
     <button class="primary" onclick="addRestaurant()">お店を登録する ＋</button>
     <p class="form-note save-note"></p>
+    <p class="form-note">投稿すると、<a href="terms.html" target="_blank" rel="noopener">利用規約</a>と<a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意したものとみなします。</p>
   </section>
 
   <section class="add-section" id="add-event">
@@ -235,12 +296,19 @@ dialog#detailDialog{background:var(--surface)}
     </div>
     <p class="form-note save-note"></p>
   </section>
+<dialog class="popup" id="popup-dashboard"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
+    <div class="section-head"><div><h2>ダッシュボード</h2><div class="sub">管理者だけに表示されます（管理者自身のアクセスは集計されません）。</div></div></div>
+    <div id="dashBody"></div>
+    <button class="secondary" type="button" onclick="loadDashboard()" style="margin-top:16px">最新の数値に更新</button>
+  </div></dialog>
 </main>
 
 <footer>
   <div class="logo">めしマス.</div>
-  <p>現地(ここ)で、何食べる？</p>
+  <p><ruby>現地<rt>ここ</rt></ruby>で、何食べる？</p>
   <p>LIVE × GOURMET × DISCOVERY</p>
+  <p class="legal-links"><a href="terms.html">利用規約</a>　｜　<a href="privacy.html">プライバシーポリシー</a></p>
+  <p class="fine">本サイトは非公式のファンサイトであり、掲載される名称に関わる企業・団体・作品・出演者とは関係がありません。</p>
 </footer>
 
 <dialog id="detailDialog"><div class="dlg" id="detailBody"></div></dialog>
@@ -320,7 +388,7 @@ const VENUE_ALIASES={
   "国立代々木競技場":["代々木体育館","代々木第一体育館"],
   "みずほPayPayドーム福岡":["福岡ドーム","paypayドーム","福岡paypayドーム","ヤフオクドーム"],
   "ベルーナドーム":["西武ドーム","メットライフドーム"],"バンテリンドーム ナゴヤ":["ナゴヤドーム","名古屋ドーム"],
-  "札幌ドーム":["sapporo dome"],"IGアリーナ":["名古屋ガイシホール","ガイシホール"]
+  "札幌ドーム":["sapporo dome"],"味の素スタジアム":["味スタ","ajinomoto stadium"],"日産スタジアム":["nissan stadium","横浜国際総合競技場"],"ZOZOマリンスタジアム":["zozo marine stadium","千葉マリンスタジアム"],"神戸ワールド記念ホール":["神戸ワールド"],"マリンメッセ福岡":["marine messe fukuoka"],"IGアリーナ":["名古屋ガイシホール","ガイシホール"]
 };
 const VENUE_MAP=new Map();
 Object.entries(VENUE_ALIASES).forEach(([c,l])=>[c,...l].forEach(a=>VENUE_MAP.set(genreKey(a),c)));
@@ -328,6 +396,25 @@ function canonicalVenue(s){
   const raw=String(s??"").normalize("NFKC").trim();if(!raw)return "";
   const k=genreKey(raw);
   return VENUE_MAP.get(k)||VENUE_MAP.get(k.replace(/(周辺|付近|近く)$/,""))||raw;
+}
+// ===== エリア（会場のグループ） =====
+const AREAS=[["北海道・東北",["北海道","青森","岩手","宮城","秋田","山形","福島"]],["東京",["東京"]],["神奈川",["神奈川"]],
+  ["埼玉・千葉・北関東",["埼玉","千葉","茨城","栃木","群馬"]],["甲信越・北陸",["新潟","富山","石川","福井","山梨","長野"]],
+  ["東海",["愛知","岐阜","静岡","三重"]],["関西",["大阪","京都","兵庫","滋賀","奈良","和歌山"]],
+  ["中国・四国",["鳥取","島根","岡山","広島","山口","徳島","香川","愛媛","高知"]],["九州・沖縄",["福岡","佐賀","長崎","熊本","大分","宮崎","鹿児島","沖縄"]]];
+const OTHER_AREA="その他";
+const AREA_ORDER=[...AREAS.map(a=>a[0]),OTHER_AREA];
+// 辞書にある会場の所属エリア（辞書にない会場は、登録されたお店の住所の都道府県から自動判定）
+const VENUE_AREA={"東京ドーム":"東京","日本武道館":"東京","国立競技場":"東京","有明アリーナ":"東京","東京ガーデンシアター":"東京","東京国際フォーラム":"東京","NHKホール":"東京","国立代々木競技場":"東京","味の素スタジアム":"東京",
+  "横浜アリーナ":"神奈川","Kアリーナ横浜":"神奈川","ぴあアリーナMM":"神奈川","日産スタジアム":"神奈川",
+  "さいたまスーパーアリーナ":"埼玉・千葉・北関東","幕張メッセ":"埼玉・千葉・北関東","ベルーナドーム":"埼玉・千葉・北関東","ZOZOマリンスタジアム":"埼玉・千葉・北関東",
+  "大阪城ホール":"関西","京セラドーム大阪":"関西","神戸ワールド記念ホール":"関西","バンテリンドーム ナゴヤ":"東海","IGアリーナ":"東海",
+  "札幌ドーム":"北海道・東北","みずほPayPayドーム福岡":"九州・沖縄","マリンメッセ福岡":"九州・沖縄"};
+function areaFromAddress(a){a=String(a||"").normalize("NFKC");for(const [area,list] of AREAS)for(const p of list)if(a.includes(p))return area;return "";}
+function areaOf(venue){
+  if(VENUE_AREA[venue])return VENUE_AREA[venue];
+  const r=restaurants.find(x=>x.venue===venue&&areaFromAddress(x.address));
+  return r?areaFromAddress(r.address):OTHER_AREA;
 }
 function venueMatches(v,q){return genreKey(v).includes(genreKey(canonicalVenue(q)));}
 function loadJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return Array.isArray(v)?v:fallback;}catch(e){return fallback;}}
@@ -458,7 +545,7 @@ function pickerOptions(kind){
 }
 function renderPickers(){
   document.querySelectorAll("select.picker").forEach(sel=>{
-    sel.innerHTML='<option value="">選択してください</option>'+pickerOptions(sel.dataset.kind).map(o=>`<option value="${escapeHTML(o)}">${escapeHTML(o)}</option>`).join("")+'<option value="__other">その他（入力する）</option>';
+    sel.innerHTML='<option value="">選択してください</option>'+pickerOptionsHTML(sel.dataset.kind)+'<option value="__other">その他（入力する）</option>';
     syncPicker(sel.dataset.for);
   });
 }
@@ -488,24 +575,95 @@ function initFolds(){
 // ===== Xで共有 =====
 function shareShop(id){
   const r=restaurants.find(x=>x.id===id);if(!r)return;
-  const text="「"+r.name+"」（"+r.venue+"周辺・"+(r.genre||"未分類")+"）\n#めしマス #アイマス";
+  const text="「"+r.name+"」（"+r.venue+"周辺・"+(r.genre||"未分類")+"）\n#めしマス #ライブ飯";
   window.open("https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(location.origin+location.pathname+"#shop="+id),"_blank","noopener");
 }
 let hashDone=false;
 function openFromHash(){const m=location.hash.match(/^#shop=([\w-]+)$/);if(m&&!hashDone){hashDone=true;openDetail(m[1]);}}
-// ===== ダークモード =====
-function applyTheme(t){document.documentElement.dataset.theme=t;document.getElementById("themeBtn").textContent=t==="dark"?"☀️ ライト":"🌙 ダーク";}
+// ===== テーマ・メニュー =====
+const THEMES=[["dark","ダーク","#1e212b"],["light","ライト","#ffffff"],["765as","765AS","#f34f6d"],["cinderella","シンデレラ","#2681c8"],["million","ミリオン","#ffc30b"],["sidem","sideM","#0fbe94"],["shiny","シャニ","#8dbbff"],["gakumas","学マス","#f39800"],["vivala","ヴイアラ","#656a75"]];
+function applyTheme(t){
+  if(!THEMES.some(x=>x[0]===t))t="765as";
+  document.documentElement.dataset.theme=t;
+  document.querySelectorAll(".theme-opt").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));
+}
+function setMenu(open){
+  document.getElementById("drawer").classList.toggle("open",open);
+  document.getElementById("drawerBackdrop").classList.toggle("open",open);
+  document.body.classList.toggle("menu-open",open);
+  document.getElementById("menuBtn").setAttribute("aria-expanded",open);
+  document.getElementById("drawer").setAttribute("aria-hidden",!open);
+  if(open)document.getElementById("drawerClose").focus();
+}
 function initTheme(){
-  applyTheme(document.documentElement.dataset.theme||"light");
-  document.getElementById("themeBtn").onclick=()=>{
-    const t=document.documentElement.dataset.theme==="dark"?"light":"dark";
-    applyTheme(t);try{localStorage.setItem("mesimasu_theme",t);}catch(e){}
-  };
+  document.getElementById("themeList").innerHTML=THEMES.map(([id,name,col])=>`<button type="button" class="theme-opt" data-t="${id}" aria-pressed="false"><span class="sw" style="background:${col}"></span>${name}</button>`).join("");
+  applyTheme(document.documentElement.dataset.theme);
+  document.getElementById("themeList").onclick=e=>{const b=e.target.closest(".theme-opt");if(!b)return;applyTheme(b.dataset.t);try{localStorage.setItem("mesimasu_theme",b.dataset.t);}catch(x){}};
+  document.getElementById("menuBtn").onclick=()=>setMenu(true);
+  document.getElementById("drawerClose").onclick=()=>setMenu(false);
+  document.getElementById("drawerBackdrop").onclick=()=>setMenu(false);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")setMenu(false);});
+  document.querySelectorAll("#drawer .drawer-nav a").forEach(a=>a.addEventListener("click",e=>{
+    setMenu(false);
+    if(a.dataset.popup){e.preventDefault();openPopup(a.dataset.popup);}
+  }));
+}
+function renderAreaOptions(){
+  const sel=document.getElementById("areaSearch"),cur=sel.value,cnt={};
+  restaurants.forEach(r=>{const a=areaOf(r.venue);cnt[a]=(cnt[a]||0)+1;});
+  events.forEach(e=>{const a=areaOf(e.venue);if(!(a in cnt))cnt[a]=0;});
+  sel.innerHTML='<option value="">すべてのエリア</option>'+AREA_ORDER.filter(a=>a in cnt).map(a=>`<option value="${escapeHTML(a)}">${escapeHTML(a)}（${cnt[a]}店舗）</option>`).join("");
+  sel.value=cur;
+}
+function browseArea(encoded){
+  closePopups();
+  ["eventSearch","venueSearch","dateSearch","genreSearch"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("areaSearch").value=decodeURIComponent(encoded);
+  searchRestaurants();
+}
+// 検索ボタン：会場・イベントのカードで設定した会場の絞り込みは解除し、画面の入力内容で検索
+function searchFromForm(){document.getElementById("venueSearch").value="";searchRestaurants();}
+function pickerOptionsHTML(kind){
+  const list=pickerOptions(kind),opt=o=>`<option value="${escapeHTML(o)}">${escapeHTML(o)}</option>`;
+  if(kind!=="venue")return list.map(opt).join("");
+  return AREA_ORDER.map(a=>{const vs=list.filter(v=>areaOf(v)===a);return vs.length?`<optgroup label="${escapeHTML(a)}">${vs.map(opt).join("")}</optgroup>`:"";}).join("");
+}
+// ===== ポップアップ / ダッシュボード / アクセス記録 =====
+function openPopup(name){closePopups();document.getElementById("popup-"+name).showModal();if(name==="dashboard")loadDashboard();}
+function closePopups(){document.querySelectorAll("dialog.popup[open]").forEach(d=>d.close());}
+function initPopups(){
+  document.querySelectorAll("dialog.popup").forEach(d=>{
+    d.addEventListener("click",e=>{if(e.target===d)d.close();});
+    d.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>d.close());
+  });
+  document.getElementById("toSearch").onclick=()=>document.querySelector(".search").scrollIntoView({behavior:"smooth",block:"start"});
+  if(!canEdit()){document.getElementById("add-event").hidden=true;document.querySelector('#drawer a[href="#add-event"]').hidden=true;}
+  if(isAdmin())document.getElementById("dashLink").hidden=false;
+  try{if(!sessionStorage.getItem("mesimasu_v")){sessionStorage.setItem("mesimasu_v","1");track("visit");}}catch(e){track("visit");}
+}
+function track(kind,id){
+  if(!SHARED||adminKey())return;
+  remote("metrics",{method:"POST",body:JSON.stringify({kind,target_id:id||null})}).catch(()=>{});
+}
+function renderEventOptions(){
+  const sel=document.getElementById("eventSearch"),cur=sel.value;
+  const names=[...new Set(events.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).map(e=>e.name))];
+  sel.innerHTML='<option value="">すべてのイベント</option>'+names.map(n=>`<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join("");
+  sel.value=cur;
+}
+async function loadDashboard(){
+  const box=document.getElementById("dashBody");box.innerHTML='<p class="sub">読み込み中…</p>';
+  try{
+    const r=await remote("rpc/admin_stats",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify({token:adminKey()})});
+    if(!r)throw Object.assign(new Error("adminfail"),{detail:"管理者の合言葉が一致しません。"});
+    const items=[["1日（直近24時間）のアクセス数",r.visits_24h],["1週間（直近7日間）のアクセス数",r.visits_7d],["1週間の店舗追加数",r.shops_added_7d],["1週間の店舗クリック数",r.shop_clicks_7d]];
+    box.innerHTML='<div class="stat-grid">'+items.map(([l,v])=>`<div class="stat"><div class="stat-v">${Number(v||0).toLocaleString("ja-JP")}</div><div class="stat-l">${l}</div></div>`).join("")+'</div>';
+  }catch(e){box.innerHTML='<p class="sub">読み込めませんでした。supabase_v13_patch.sql を実行済みか確認してください。<br>【詳細】'+escapeHTML(e.detail||e.message)+'</p>';}
 }
 function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function uid(prefix){return prefix+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);}
 
-function renderEvents(){
+function renderEvents(){renderEventOptions();
   document.getElementById("eventList").innerHTML=events.length?events.map(e=>`
     <article class="event"><small>${escapeHTML(e.date||"開催日未設定")}</small>
     <h3>${escapeHTML(e.name)}</h3><p>📍 ${escapeHTML(e.venue)}</p>
@@ -520,17 +678,22 @@ function renderBrowseLists(){
   const genreByKey=new Map();
   restaurants.forEach(r=>{const g=canonicalGenre(r.genre);if(g)genreByKey.set(genreKey(g),g);});
   const genres=[...genreByKey.values()].sort();
-  document.getElementById("venueList").innerHTML=venues.map((v,i)=>`
+  const venueCard=v=>`
     <button class="browse-card venue" onclick="browseVenue('${safeEnc(v)}')">
       <span class="browse-icon">📍</span><span class="browse-name">${escapeHTML(v)}</span>
       <span class="browse-count">${restaurants.filter(r=>r.venue===v).length}店舗 →</span>
-    </button>`).join("")||"<p>会場に紐づくお店はまだありません。</p>";
+    </button>`;
+  const byArea={};venues.forEach(v=>{const a=areaOf(v);(byArea[a]=byArea[a]||[]).push(v);});
+  document.getElementById("venueList").innerHTML=AREA_ORDER.filter(a=>byArea[a]).map(a=>`
+    <div class="area-group"><div class="area-head"><h3>${escapeHTML(a)}</h3>
+      <button class="secondary" onclick="browseArea('${safeEnc(a)}')">このエリアのお店をすべて見る（${restaurants.filter(r=>areaOf(r.venue)===a).length}店舗）→</button></div>
+    <div class="browse-grid">${byArea[a].map(venueCard).join("")}</div></div>`).join("")||"<p>会場に紐づくお店はまだありません。</p>";
   document.getElementById("genreList").innerHTML=genres.map(g=>`
     <button class="browse-card genre" onclick="browseGenre('${safeEnc(g)}')">
       <span class="browse-icon">🍴</span><span class="browse-name">${escapeHTML(g)}</span>
       <span class="browse-count">${restaurants.filter(r=>genreKey(canonicalGenre(r.genre))===genreKey(g)).length}店舗 →</span>
     </button>`).join("")||"<p>ジャンルはまだ登録されていません。</p>";
-  renderGenreOptions();renderPickers();
+  renderGenreOptions();renderPickers();renderAreaOptions();
 }
 function renderRestaurants(){
   document.getElementById("restaurantList").innerHTML=visible.map(r=>`
@@ -549,8 +712,9 @@ function renderRestaurants(){
     <div class="more">詳細・口コミ一覧を見る（${(r.reviews||[]).length}件） →</div></div></article>`).join("");
   document.getElementById("empty").hidden=visible.length!==0;
 }
-function selectEvent(id){
+function selectEvent(id){closePopups();
   const e=events.find(x=>x.id===id);if(!e)return;
+  document.getElementById("areaSearch").value="";
   document.getElementById("eventSearch").value=e.name;
   document.getElementById("venueSearch").value=e.venue;
   document.getElementById("dateSearch").value=e.date||"";
@@ -558,6 +722,8 @@ function selectEvent(id){
   searchRestaurants();
 }
 function browseVenue(encoded){
+  closePopups();
+  document.getElementById("areaSearch").value="";
   document.getElementById("eventSearch").value="";
   document.getElementById("venueSearch").value=decodeURIComponent(encoded);
   document.getElementById("dateSearch").value="";
@@ -565,6 +731,8 @@ function browseVenue(encoded){
   searchRestaurants();
 }
 function browseGenre(encoded){
+  closePopups();
+  document.getElementById("areaSearch").value="";
   document.getElementById("eventSearch").value="";
   document.getElementById("venueSearch").value="";
   document.getElementById("dateSearch").value="";
@@ -574,27 +742,28 @@ function browseGenre(encoded){
 function searchRestaurants(){
   const eventText=document.getElementById("eventSearch").value.trim();
   const venueText=document.getElementById("venueSearch").value.trim();
+  const areaText=document.getElementById("areaSearch").value;
   const dateText=document.getElementById("dateSearch").value;
   const genreText=document.getElementById("genreSearch").value.trim();
   const matchingEvents=events.filter(e=>
     (!eventText||e.name.includes(eventText))&&
-    (!venueText||venueMatches(e.venue,venueText))&&
+    (!venueText||venueMatches(e.venue,venueText))&&(!areaText||areaOf(e.venue)===areaText)&&
     (!dateText||e.date===dateText)
   );
   const eventActive=!!(eventText||dateText);
   visible=restaurants.filter(r=>
-    (!venueText||venueMatches(r.venue,venueText))&&
+    (!venueText||venueMatches(r.venue,venueText))&&(!areaText||areaOf(r.venue)===areaText)&&
     (!genreText||genreMatches(r.genre,genreText))&&
     (!eventActive||matchingEvents.some(e=>e.venue===r.venue))&&
     tagsMatch(r,pickedTags("tagFilter"))
   );
-  const terms=[eventText,venueText,dateText,genreText,...pickedTags("tagFilter")].filter(Boolean);
+  const terms=[eventText,areaText,venueText,dateText,genreText,...pickedTags("tagFilter")].filter(Boolean);
   document.getElementById("resultDescription").textContent=terms.length?terms.join(" / ")+" の検索結果":"すべてのお店";
   renderRestaurants();
   document.getElementById("restaurants").scrollIntoView({behavior:"smooth"});
 }
 function showAllRestaurants(){
-  ["eventSearch","venueSearch","dateSearch","genreSearch"].forEach(id=>document.getElementById(id).value="");
+  ["eventSearch","venueSearch","areaSearch","dateSearch","genreSearch"].forEach(id=>document.getElementById(id).value="");
   visible=[...restaurants];
   document.getElementById("resultDescription").textContent="すべてのお店";
   renderRestaurants();
@@ -620,7 +789,7 @@ function submitEvent(){
     saveEvents();renderEvents();refreshCurrentResults();
     alert("イベントを更新しました！");return;
   }
-  if(SHARED){guarded(async()=>{await insertRemote("events",{name,venue,date});await loadAll();clearEventForm();alert("イベントを登録しました！");});return;}
+  if(SHARED){guarded(async()=>{await adminRpc("admin_add_event",{p_name:name,p_venue:venue,p_date:date});await loadAll();clearEventForm();alert("イベントを登録しました！");});return;}
   events.push({id:uid("event"),name,venue,date});
   saveEvents();renderEvents();clearEventForm();renderPickers();
   alert("イベントを登録しました！");
@@ -681,10 +850,11 @@ function deleteRestaurant(id){
 function refreshCurrentResults(){
   const eventText=document.getElementById("eventSearch").value.trim();
   const venueText=document.getElementById("venueSearch").value.trim();
+  const areaText=document.getElementById("areaSearch").value;
   const dateText=document.getElementById("dateSearch").value;
   const genreText=document.getElementById("genreSearch").value.trim();
-  const matches=events.filter(e=>(!eventText||e.name.includes(eventText))&&(!venueText||venueMatches(e.venue,venueText))&&(!dateText||e.date===dateText));
-  visible=restaurants.filter(r=>(!venueText||venueMatches(r.venue,venueText))&&(!genreText||genreMatches(r.genre,genreText))&&(!(eventText||dateText)||matches.some(e=>e.venue===r.venue))&&tagsMatch(r,pickedTags("tagFilter")));
+  const matches=events.filter(e=>(!eventText||e.name.includes(eventText))&&(!venueText||venueMatches(e.venue,venueText))&&(!areaText||areaOf(e.venue)===areaText)&&(!dateText||e.date===dateText));
+  visible=restaurants.filter(r=>(!venueText||venueMatches(r.venue,venueText))&&(!areaText||areaOf(r.venue)===areaText)&&(!genreText||genreMatches(r.genre,genreText))&&(!(eventText||dateText)||matches.some(e=>e.venue===r.venue))&&tagsMatch(r,pickedTags("tagFilter")));
   renderRestaurants();
 }
 function latestReview(r){const l=r.reviews||[];return l.length?l[l.length-1].text:"";}
@@ -692,6 +862,7 @@ function fmtDate(d){return d?new Date(d).toLocaleString("ja-JP",{year:"numeric",
 let detailId=null;
 function openDetail(id,focusReview){
   if(!restaurants.find(x=>x.id===id))return;
+  track("shop_click",id);
   detailId=id;renderDetail();
   const d=document.getElementById("detailDialog");
   if(!d.open)d.showModal();
@@ -715,7 +886,8 @@ function renderDetail(){
     <textarea id="detailReviewInput" maxlength="500" rows="3" placeholder="ライブ前の食事におすすめ！"></textarea>
     <div class="tag-label">ライブ向きタグ（任意）</div>${tagPickHTML("detailTagPick")}
     <button class="primary" onclick="addReview()">口コミを投稿する</button>
-    <p class="form-note">${SAVE_NOTE}</p>`;
+    <p class="form-note">${SAVE_NOTE}</p>
+    <p class="form-note">投稿すると、<a href="terms.html" target="_blank" rel="noopener">利用規約</a>と<a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意したものとみなします。</p>`;
 }
 function reviewRestaurant(id){openDetail(id,true);}
 function addReview(){
@@ -739,7 +911,7 @@ document.getElementById("detailDialog").addEventListener("click",e=>{if(e.target
 document.getElementById("detailDialog").addEventListener("close",()=>{detailId=null;});
 renderEvents();renderBrowseLists();renderRestaurants();
 document.querySelectorAll(".save-note").forEach(n=>n.textContent=SAVE_NOTE);
-initTheme();initFolds();renderPickers();
+initTheme();renderPickers();initPopups();
 document.getElementById("newTagPick").outerHTML=tagPickHTML("newTagPick");
 document.getElementById("tagFilter").outerHTML=tagPickHTML("tagFilter");
 if(SHARED&&adminKey()){const f=document.querySelector("footer"),a=document.createElement("p");a.textContent="🔧 管理者モード（全投稿の編集・削除が可能）";f.appendChild(a);}
