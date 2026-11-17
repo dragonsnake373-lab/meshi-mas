@@ -685,7 +685,7 @@ function renderEvents(){renderEventOptions();
     <article class="event"><small>${escapeHTML(e.date||"開催日未設定")}</small>
     <h3>${escapeHTML(e.name)}</h3><p>📍 ${escapeHTML(e.venue)}</p>
     <div class="actions">
-      <button class="view-btn" onclick="selectEvent('${e.id}')">このエリアのお店を見る →</button>
+      <button class="view-btn" onclick="selectEvent('${e.id}')">周辺のお店を見る →</button>
       ${!canEdit()?"":`<button class="green" onclick="editEvent('${e.id}')">編集</button>`}
       ${canDel(e.id)?`<button class="danger" onclick="deleteEvent('${e.id}')">削除</button>`:""}${SHARED?`<button class="orange" onclick="reportItem('events','${e.id}')">通報</button>`:""}
     </div></article>`).join(""):"<p>イベントはまだ登録されていません。</p>";
@@ -751,10 +751,9 @@ function applyFilters(){
     (!venueText||venueMatches(r.venue,venueText))&&(!areaText||areaOf(r.venue)===areaText)&&
     (!genreText||genreMatches(r.genre,genreText))&&
     (!walkText||(r.walk_min!=null&&Number(r.walk_min)<=Number(walkText)))&&
-    (!eventText||matchingEvents.some(e=>areaOf(e.venue)===areaOf(r.venue)))&&
+    (!eventText||matchingEvents.some(e=>e.venue===r.venue))&&
     tagsMatch(r,tagSel));
-  const evAreas=eventText?[...new Set(matchingEvents.map(e=>areaOf(e.venue)))]:[];
-  return [eventText,evAreas.length?evAreas.join("・")+"エリア":"",areaText,venueText,genreText,walkText?"徒歩"+walkText+"分以内":"",...tagSel].filter(Boolean);
+  return [eventText,areaText,venueText,genreText,walkText?"徒歩"+walkText+"分以内":"",...tagSel].filter(Boolean);
 }
 function searchRestaurants(){
   const terms=applyFilters();
