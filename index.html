@@ -232,7 +232,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
         <div><label for="eventSearch">ライブ・イベント</label><select id="eventSearch"><option value="">すべてのイベント</option></select></div>
         <div><label for="areaSearch">エリア</label><select id="areaSearch"><option value="">すべてのエリア</option></select><input id="venueSearch" type="hidden"></div>
         <div><label for="dateSearch">開催日</label><input id="dateSearch" type="date"></div>
-        <div><label for="genreSearch">料理ジャンル</label><input id="genreSearch" list="genreOptions" placeholder="例：ラーメン、カフェ"></div>
+        <div><label for="genreSearch">料理ジャンル</label><select id="genreSearch"><option value="">すべてのジャンル</option></select></div>
       </div>
       <div class="tag-label">ライブ向きタグで絞り込み</div><div id="tagFilter"></div>
       <button class="primary" onclick="searchFromForm()">この条件でお店を探す →</button>
@@ -370,7 +370,7 @@ function canonicalGenre(s){
   return GENRE_MAP.get(k)||GENRE_MAP.get(k.replace(/(専門店|料理|屋|店)$/,""))||raw;
 }
 function genreMatches(genre,query){
-  return genreKey(canonicalGenre(genre)).includes(genreKey(canonicalGenre(query)));
+  return genreKey(canonicalGenre(genre))===genreKey(canonicalGenre(query));
 }
 function renderGenreOptions(){
   const names=new Set([...Object.keys(GENRE_ALIASES),...restaurants.map(r=>canonicalGenre(r.genre)).filter(Boolean)]);
@@ -608,6 +608,12 @@ function initTheme(){
     if(a.dataset.popup){e.preventDefault();openPopup(a.dataset.popup);}
   }));
 }
+function renderGenreSelect(){
+  const sel=document.getElementById("genreSearch"),cur=sel.value,cnt={};
+  restaurants.forEach(r=>{const g=canonicalGenre(r.genre)||"未分類";cnt[g]=(cnt[g]||0)+1;});
+  sel.innerHTML='<option value="">すべてのジャンル</option>'+Object.keys(cnt).sort((a,b)=>a.localeCompare(b,"ja")).map(g=>`<option value="${escapeHTML(g)}">${escapeHTML(g)}（${cnt[g]}店舗）</option>`).join("");
+  sel.value=cur;
+}
 function renderAreaOptions(){
   const sel=document.getElementById("areaSearch"),cur=sel.value,cnt={};
   restaurants.forEach(r=>{const a=areaOf(r.venue);cnt[a]=(cnt[a]||0)+1;});
@@ -693,7 +699,7 @@ function renderBrowseLists(){
       <span class="browse-icon">🍴</span><span class="browse-name">${escapeHTML(g)}</span>
       <span class="browse-count">${restaurants.filter(r=>genreKey(canonicalGenre(r.genre))===genreKey(g)).length}店舗 →</span>
     </button>`).join("")||"<p>ジャンルはまだ登録されていません。</p>";
-  renderGenreOptions();renderPickers();renderAreaOptions();
+  renderGenreOptions();renderPickers();renderAreaOptions();renderGenreSelect();
 }
 function renderRestaurants(){
   document.getElementById("restaurantList").innerHTML=visible.map(r=>`
