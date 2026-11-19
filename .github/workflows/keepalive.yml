@@ -1,0 +1,23 @@
+# Supabase 無料プランは、一定期間アクセスがないとプロジェクトが一時停止されることがあります。
+# このワークフローは、週に1回、データベースへ軽い読み取りを送って、停止を防ぎます。
+#
+# 設定手順
+#  1) GitHubのリポジトリで「Add file」→「Create new file」を開き、ファイル名の欄に  .github/workflows/keepalive.yml  と入力
+#  2) このファイルの中身を貼り付けて「Commit changes」
+#  3) リポジトリの Settings → Secrets and variables → Actions → New repository secret で、次の2つを登録
+#       SUPABASE_URL : https://gnuvwzqsvnxmrdzbfoti.supabase.co
+#       SUPABASE_KEY : sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA（publishable key。secret key は登録しない）
+#  4) Actions タブの「keepalive」→「Run workflow」で、動作を確認
+name: keepalive
+on:
+  schedule:
+    - cron: "0 3 * * 1"   # 毎週月曜 12:00（日本時間）
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          curl -fsS "${{ secrets.https://gnuvwzqsvnxmrdzbfoti.supabase.co }}/rest/v1/restaurants?select=id&limit=1" \
+            -H "apikey: ${{ secrets.sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA }}" > /dev/null
