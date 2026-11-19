@@ -3,11 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://*.supabase.co; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://dragonsnake373-lab.github.io/meshi-mas/">
+<meta name="theme-color" content="#f34f6d">
 <title>めしマス｜現地(ここ)で、何食べる？</title>
 <meta name="description" content="ライブ会場の近くで食べられるお店を、イベント・会場・ジャンルから探せるグルメ検索サイト。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="めしマス｜現地(ここ)で、何食べる？">
-<meta property="og:description" content="ライブの日のごはん探しを、もっと楽に。会場周辺のお店をイベント・会場・ジャンルから探そう。">
+<meta property="og:description" content="ライブの日のごはん探しを、もっと楽しく。会場周辺のお店をイベント・会場・ジャンルから探そう。">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:image" content="https://dragonsnake373-lab.github.io/meshi-mas/ogp.png?v=1">
 <meta property="og:image:width" content="1200">
@@ -196,9 +199,13 @@ dialog.popup .section-head{padding-right:48px;margin-bottom:18px}
 footer a{color:#fff;text-decoration:underline}
 footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-height:1.6}
 .form-note a{color:var(--accent-text)}
+.dlg ol{padding-left:1.4em;line-height:1.9}
+.dlg .note{font-size:13px;color:var(--muted)}
+#empty a{color:var(--accent-text);font-weight:800}
 </style>
 </head>
 <body>
+<noscript><div style="padding:16px;background:#fff3b0;color:#5a4500;text-align:center">このサイトの利用には、JavaScriptを有効にしてください。</div></noscript>
 <datalist id="genreOptions"></datalist>
 <header>
   <button class="menu-btn" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="drawer">☰</button>
@@ -217,6 +224,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
     <a href="#restaurants">お店一覧</a>
     <a href="#add-restaurant">お店追加</a>
     <a href="#add-event">イベント追加</a>
+    <a href="#" data-popup="about">使い方・このサイトについて</a>
     <a href="#" data-popup="dashboard" id="dashLink" hidden>📊 ダッシュボード</a>
   </nav>
   <h4>テーマカラー</h4>
@@ -263,7 +271,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
       <button class="secondary" onclick="showAllRestaurants()">すべてのお店を表示</button>
     </div>
     <div class="results" id="restaurantList"></div>
-    <div id="empty" hidden>条件に合うお店はまだ登録されていません。最初の登録をしてみませんか？</div>
+    <div id="empty" hidden>条件に合うお店がありません。</div>
   </section>
 
   <section class="add-section" id="add-restaurant">
@@ -298,6 +306,18 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
     </div>
     <p class="form-note save-note"></p>
   </section>
+<dialog class="popup" id="popup-about"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
+    <div class="section-head"><div><h2>使い方・このサイトについて</h2><div class="sub">ライブ・イベントの前後に行けるお店を、みんなで共有するサイトです。</div></div></div>
+    <ol>
+      <li>検索欄で、イベント・エリア・ジャンル・徒歩時間を選んで、お店を探します。</li>
+      <li>お店のカードを押すと、詳細と口コミ一覧が見られます。</li>
+      <li>行ったお店は「お店を追加」から、口コミ（ライブ向きタグつき）は詳細画面から投稿できます。</li>
+      <li>不適切な投稿は、詳細画面の「通報」からお知らせください。</li>
+      <li>配色は、メニューの「テーマカラー」で変えられます。</li>
+    </ol>
+    <p class="note">本サイトは非公式のファンサイトであり、掲載される名称に関わる企業・団体・作品・出演者とは関係がありません。</p>
+    <p><a href="terms.html">利用規約</a>　｜　<a href="privacy.html">プライバシーポリシー</a>　｜　<a href="terms.html#contact">お問い合わせ・削除のご依頼</a></p>
+  </div></dialog>
 <dialog class="popup" id="popup-walk"><div class="dlg"><button class="close-x" data-close type="button" aria-label="閉じる">×</button>
     <div class="section-head"><div><h2>徒歩時間から探す</h2><div class="sub">会場からお店までの徒歩時間で探せます。徒歩時間が登録されているお店が対象です。</div></div></div>
     <div class="browse-grid" id="walkList"></div>
@@ -313,7 +333,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
   <div class="logo">めしマス.</div>
   <p><ruby>現地<rt>ここ</rt></ruby>で、何食べる？</p>
   <p>LIVE × GOURMET × DISCOVERY</p>
-  <p class="legal-links"><a href="terms.html">利用規約</a>　｜　<a href="privacy.html">プライバシーポリシー</a></p>
+  <p class="legal-links"><a href="terms.html">利用規約</a>　｜　<a href="privacy.html">プライバシーポリシー</a>　｜　<a href="terms.html#contact">お問い合わせ</a></p>
   <p class="fine">本サイトは非公式のファンサイトであり、掲載される名称に関わる企業・団体・作品・出演者とは関係がありません。</p>
 </footer>
 
@@ -326,7 +346,8 @@ let storageWarned=false;
 // ★ Supabase の Project URL と publishable key（sb_publishable_…）を貼ると共有モード。空のままなら端末内のみ保存
 // ※ secret key / service_role key は絶対に貼らないでください
 const SUPABASE_URL="https://gnuvwzqsvnxmrdzbfoti.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA";
+const SUPABASE_ANON_KEY="sb_publishable_soXtE5FI5UB4ndRMsR42xQ_ylYlkXmA
+";
 const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
 const sampleEvents=[
   {id:"event-1",name:"ライブイベント A",venue:"東京ドーム",date:"2026-12-20"},
@@ -394,7 +415,7 @@ const VENUE_ALIASES={
   "国立代々木競技場":["代々木体育館","代々木第一体育館"],
   "みずほPayPayドーム福岡":["福岡ドーム","paypayドーム","福岡paypayドーム","ヤフオクドーム"],
   "ベルーナドーム":["西武ドーム","メットライフドーム"],"バンテリンドーム ナゴヤ":["ナゴヤドーム","名古屋ドーム"],
-  "札幌ドーム":["sapporo dome"],"味の素スタジアム":["味スタ","ajinomoto stadium"],"日産スタジアム":["nissan stadium","横浜国際総合競技場"],"ZOZOマリンスタジアム":["zozo marine stadium","千葉マリンスタジアム"],"神戸ワールド記念ホール":["神戸ワールド"],"マリンメッセ福岡":["marine messe fukuoka"],"IGアリーナ":["IG arena"]
+  "札幌ドーム":["sapporo dome"],"味の素スタジアム":["味スタ","ajinomoto stadium"],"日産スタジアム":["nissan stadium","横浜国際総合競技場"],"ZOZOマリンスタジアム":["zozo marine stadium","千葉マリンスタジアム"],"神戸ワールド記念ホール":["神戸ワールド"],"マリンメッセ福岡":["marine messe fukuoka"],"IGアリーナ":["名古屋ガイシホール","ガイシホール"]
 };
 const VENUE_MAP=new Map();
 Object.entries(VENUE_ALIASES).forEach(([c,l])=>[c,...l].forEach(a=>VENUE_MAP.set(genreKey(a),c)));
@@ -529,6 +550,7 @@ async function loadRestaurants(){
     return r;
   }
 }
+const EMPTY_HTML='条件に合うお店がありません。<a href="#add-restaurant">お店を追加する</a>';
 async function loadAll(){
   const [ev,rs]=await Promise.all([
     remote("events?select=id,name,venue,date&hidden=eq.false&order=date.asc&limit=500"),
@@ -536,6 +558,7 @@ async function loadAll(){
   const rv=await loadReviews();
   events=ev.map(e=>({...e,venue:canonicalVenue(e.venue)||e.venue}));
   restaurants=rs.map(r=>({...r,venue:canonicalVenue(r.venue)||r.venue,reviews:rv.filter(v=>v.restaurant_id===r.id).map(v=>({id:v.id,text:v.text,tags:v.tags||[],date:v.created_at}))}));
+  document.getElementById("empty").innerHTML=EMPTY_HTML;
   renderEvents();renderBrowseLists();refreshCurrentResults();
   if(detailId)renderDetail();
   openFromHash();
@@ -649,6 +672,7 @@ function pickerOptionsHTML(kind){
 function openPopup(name){closePopups();document.getElementById("popup-"+name).showModal();if(name==="dashboard")loadDashboard();}
 function closePopups(){document.querySelectorAll("dialog.popup[open]").forEach(d=>d.close());}
 function initPopups(){
+  document.getElementById("empty").innerHTML=SHARED?"読み込み中…":EMPTY_HTML;
   document.querySelectorAll("dialog.popup").forEach(d=>{
     d.addEventListener("click",e=>{if(e.target===d)d.close();});
     d.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>d.close());
@@ -910,7 +934,7 @@ initTheme();renderPickers();initPopups();
 document.getElementById("newTagPick").outerHTML=tagPickHTML("newTagPick");
 document.getElementById("tagFilter").outerHTML=tagPickHTML("tagFilter");
 if(SHARED&&adminKey()){const f=document.querySelector("footer"),a=document.createElement("p");a.textContent="🔧 管理者モード（全投稿の編集・削除が可能）";f.appendChild(a);}
-if(SHARED)loadAll().catch(e=>{console.error(e);alert("サーバーに接続できませんでした。\n\n【詳細】"+(e.detail||e.message));});
+if(SHARED)loadAll().catch(e=>{console.error(e);document.getElementById("empty").textContent="読み込めませんでした。時間をおいて、ページを再読み込みしてください。";alert("サーバーに接続できませんでした。\n\n【詳細】"+(e.detail||e.message));});
 </script>
 </body>
 </html>
