@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://unpkg.com; style-src 'unsafe-inline' https://unpkg.com; img-src data: blob: https://*.tile.openstreetmap.org; connect-src https://*.supabase.co https://photon.komoot.io; base-uri 'none'; form-action 'none'">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://*.supabase.co; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://dragonsnake373-lab.github.io/meshi-mas/">
 <meta name="theme-color" content="#f34f6d">
 <title>めしマス｜現地(ここ)で、何食べる？</title>
@@ -81,30 +80,6 @@ h3{font-size:20px}
 .browse-card.venue{border-bottom:4px solid var(--blue)}
 .browse-card.genre{border-bottom:4px solid var(--green)}
 .results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-
-/* ===== 地図検索 ===== */
-.map-results-layout{display:grid;grid-template-columns:minmax(300px,.92fr) minmax(0,1.08fr);gap:20px;align-items:start}
-.map-list-pane{min-width:0}
-.map-list-pane .results{grid-template-columns:1fr}
-.map-pane{position:sticky;top:94px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:12px;box-shadow:0 5px 18px #33333309}
-#restaurantMap{width:100%;height:640px;min-height:420px;border-radius:12px;z-index:1;background:#e9edf0}
-.map-status{font-size:13px;color:var(--muted);margin:8px 4px 0;line-height:1.5}
-.restaurant.map-active{outline:3px solid var(--coral);box-shadow:0 8px 24px #b84d7c30}
-.map-focus-btn{background:var(--accent-soft);color:var(--accent-ink)}
-.leaflet-popup-content{font-family:"Noto Sans JP","Yu Gothic",Meiryo,sans-serif;font-size:14px;line-height:1.5}
-.leaflet-popup-content button{margin-top:6px;padding:7px 10px;background:var(--coral);color:var(--on-accent)}
-@media(max-width:850px){
- .map-results-layout{grid-template-columns:1fr}
- .map-pane{position:relative;top:auto;order:-1}
- #restaurantMap{height:56vh;min-height:390px;max-height:620px}
- .map-list-pane .results{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:600px){
- .map-list-pane .results{grid-template-columns:1fr}
- .map-pane{padding:8px}
- #restaurantMap{height:55vh;min-height:360px;max-height:560px}
-}
-
 .restaurant{background:var(--surface);border-radius:17px;overflow:hidden;border:1px solid var(--line);box-shadow:0 5px 18px #33333309}
 .restaurant{cursor:pointer;transition:box-shadow .15s,transform .15s}
 .restaurant:hover,.restaurant:focus-visible{box-shadow:0 8px 24px #b84d7c22;transform:translateY(-2px);outline:none}
@@ -295,16 +270,8 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
       <div><h2>お店一覧</h2><div class="sub" id="resultDescription">ライブ前後に立ち寄りたいお店を紹介。</div></div>
       <button class="secondary" onclick="showAllRestaurants()">すべてのお店を表示</button>
     </div>
-    <div class="map-results-layout">
-      <div class="map-list-pane">
-        <div class="results" id="restaurantList"></div>
-        <div id="empty" hidden>条件に合うお店がありません。</div>
-      </div>
-      <aside class="map-pane" aria-label="店舗の地図">
-        <div id="restaurantMap" role="application" aria-label="店舗の位置を示す地図"></div>
-        <p class="map-status" id="mapStatus">店舗の位置情報を読み込んでいます。</p>
-      </aside>
-    </div>
+    <div class="results" id="restaurantList"></div>
+    <div id="empty" hidden>条件に合うお店がありません。</div>
   </section>
 
   <section class="add-section" id="add-restaurant">
@@ -343,7 +310,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
     <div class="section-head"><div><h2>使い方・このサイトについて</h2><div class="sub">ライブ・イベントの前後に行けるお店を、みんなで共有するサイトです。</div></div></div>
     <ol>
       <li>検索欄で、イベント・エリア・ジャンル・徒歩時間を選んで、お店を探します。</li>
-      <li>地図のピンやお店のカードを選ぶと、位置を確認できます。お店のカードを押すと詳細と口コミ一覧が見られます。</li>
+      <li>お店のカードを押すと、詳細と口コミ一覧が見られます。</li>
       <li>行ったお店は「お店を追加」から、口コミ（ライブ向きタグつき）は詳細画面から投稿できます。</li>
       <li>不適切な投稿は、詳細画面の「通報」からお知らせください。</li>
       <li>配色は、メニューの「テーマカラー」で変えられます。</li>
@@ -372,7 +339,6 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
 
 <dialog id="detailDialog"><div class="dlg" id="detailBody"></div></dialog>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 const RESTAURANT_KEY="mesimasu_restaurants_v2";
 const EVENT_KEY="mesimasu_events_v1";
@@ -771,13 +737,12 @@ function renderBrowseLists(){
 }
 function renderRestaurants(){
   document.getElementById("restaurantList").innerHTML=visible.map(r=>`
-    <article class="restaurant" id="shop-card-${escapeHTML(r.id)}" tabindex="0" role="button" onclick="openDetail('${r.id}')" onkeydown="if(event.key==='Enter'&&event.target===this)openDetail('${r.id}')">
+    <article class="restaurant" tabindex="0" role="button" onclick="openDetail('${r.id}')" onkeydown="if(event.key==='Enter'&&event.target===this)openDetail('${r.id}')">
     <div class="info"><h3>${escapeHTML(r.name)}</h3>
     <div class="meta">📍 ${escapeHTML(r.venue)} 周辺${r.walk_min?`・🚶徒歩${r.walk_min}分`:""}<br>${escapeHTML(r.address)}</div>
     <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span>${liveTagsHTML(r)}</div>
     <p class="meta">${escapeHTML(latestReview(r)||"口コミはまだありません。")}</p>
     <div class="actions" onclick="event.stopPropagation()">
-      <button class="map-focus-btn" onclick="focusRestaurant('${r.id}',true)">地図で見る</button>
       <button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップ</button>
       <button class="orange" onclick="reviewRestaurant('${r.id}')">口コミを書く</button>
       ${SHARED?`<button class="secondary" onclick="shareShop('${r.id}')">Xで共有</button>`:""}
@@ -786,111 +751,7 @@ function renderRestaurants(){
     </div>
     <div class="more">詳細・口コミ一覧を見る（${(r.reviews||[]).length}件） →</div></div></article>`).join("");
   document.getElementById("empty").hidden=visible.length!==0;
-  renderRestaurantMap();
 }
-// ===== 店舗地図（Leaflet + OpenStreetMap + Photon住所検索）=====
-// 店舗住所から位置を取得し、この端末のlocalStorageにキャッシュします。DB変更は不要です。
-const GEO_CACHE_KEY="mesimasu_geocode_v1";
-let geoCache={};
-try{geoCache=JSON.parse(localStorage.getItem(GEO_CACHE_KEY)||"{}")||{};}catch(e){geoCache={};}
-let restaurantMap=null,mapMarkers=new Map(),geoQueue=[],geoPending=new Set(),geoRunning=false,mapRenderVersion=0;
-function geoCacheKey(r){return String(r.address||"").normalize("NFKC").trim();}
-function saveGeoCache(){try{localStorage.setItem(GEO_CACHE_KEY,JSON.stringify(geoCache));}catch(e){}}
-function initRestaurantMap(){
-  if(restaurantMap||!window.L)return;
-  const el=document.getElementById("restaurantMap");if(!el)return;
-  restaurantMap=L.map(el,{scrollWheelZoom:false}).setView([36.2048,138.2529],5);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
-    maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
-  }).addTo(restaurantMap);
-}
-function addRestaurantMarker(r,lat,lon){
-  if(!restaurantMap||mapMarkers.has(r.id))return;
-  const marker=L.marker([lat,lon]).addTo(restaurantMap);
-  marker.bindPopup(`<strong>${escapeHTML(r.name)}</strong><br>${escapeHTML(r.venue)} 周辺<br><button type="button" onclick="openDetail('${r.id}')">店舗詳細を見る</button>`);
-  marker.on("click",()=>highlightRestaurantCard(r.id,false));
-  mapMarkers.set(r.id,marker);
-}
-function highlightRestaurantCard(id,scroll=true){
-  document.querySelectorAll(".restaurant.map-active").forEach(el=>el.classList.remove("map-active"));
-  const card=document.getElementById("shop-card-"+CSS.escape(String(id)));
-  if(card){card.classList.add("map-active");if(scroll)card.scrollIntoView({behavior:"smooth",block:"nearest"});}
-}
-function focusRestaurant(id,openPopup=true){
-  const marker=mapMarkers.get(id);
-  highlightRestaurantCard(id,true);
-  if(marker&&restaurantMap){
-    restaurantMap.flyTo(marker.getLatLng(),Math.max(restaurantMap.getZoom(),16),{duration:.45});
-    if(openPopup)marker.openPopup();
-  }else{
-    const r=restaurants.find(x=>x.id===id),status=document.getElementById("mapStatus");
-    if(r&&status)status.textContent="この店舗の位置を取得中です。住所が正しく登録されているか確認してください。";
-  }
-}
-async function geocodeAddress(address){
-  const q=String(address||"").trim();if(!q)return null;
-  if(Object.prototype.hasOwnProperty.call(geoCache,q))return geoCache[q];
-  const url="https://photon.komoot.io/api/?limit=1&lang=ja&q="+encodeURIComponent(q+" 日本");
-  try{
-    const response=await fetch(url,{headers:{Accept:"application/json"}});
-    if(!response.ok)throw new Error("geocode "+response.status);
-    const data=await response.json(),coords=data.features&&data.features[0]&&data.features[0].geometry&&data.features[0].geometry.coordinates;
-    const point=coords&&Number.isFinite(Number(coords[0]))&&Number.isFinite(Number(coords[1]))?{lat:Number(coords[1]),lon:Number(coords[0])}:null;
-    geoCache[q]=point;saveGeoCache();return point;
-  }catch(e){console.warn("住所検索に失敗しました",q,e);return null;}
-}
-function enqueueGeocode(r,version){
-  const key=geoCacheKey(r);if(!key||geoPending.has(key)||Object.prototype.hasOwnProperty.call(geoCache,key))return;
-  geoPending.add(key);geoQueue.push({r,key,version});processGeoQueue();
-}
-async function processGeoQueue(){
-  if(geoRunning)return;geoRunning=true;
-  while(geoQueue.length){
-    const item=geoQueue.shift(),point=await geocodeAddress(item.key);
-    geoPending.delete(item.key);
-    if(point&&restaurantMap){
-      // 同じ住所の店舗もまとめてピン表示。検索条件が変わっていた場合も現在の一覧に反映する。
-      visible.filter(r=>geoCacheKey(r)===item.key).forEach(r=>addRestaurantMarker(r,point.lat,point.lon));
-      if(visible.some(r=>geoCacheKey(r)===item.key))updateMapBounds();
-    }
-    const status=document.getElementById("mapStatus");
-    if(status){
-      const remaining=geoQueue.length;
-      status.textContent=remaining?`店舗の位置を検索中…（残り ${remaining} 件）`:
-        `${mapMarkers.size}店舗を地図に表示しています。位置が見つからない店舗は住所を確認してください。`;
-    }
-    if(geoQueue.length)await new Promise(resolve=>setTimeout(resolve,350));
-  }
-  geoRunning=false;
-}
-function updateMapBounds(){
-  if(!restaurantMap||!mapMarkers.size)return;
-  const points=[...mapMarkers.values()].map(m=>m.getLatLng());
-  if(points.length===1)restaurantMap.setView(points[0],15);
-  else restaurantMap.fitBounds(L.latLngBounds(points),{padding:[28,28],maxZoom:15});
-}
-function renderRestaurantMap(){
-  const status=document.getElementById("mapStatus");
-  if(!window.L){if(status)status.textContent="地図ライブラリを読み込めませんでした。通信環境を確認してください。";return;}
-  initRestaurantMap();if(!restaurantMap)return;
-  mapRenderVersion++;const version=mapRenderVersion;
-  mapMarkers.forEach(marker=>restaurantMap.removeLayer(marker));mapMarkers.clear();
-  if(!visible.length){status.textContent="表示する店舗がありません。";restaurantMap.setView([36.2048,138.2529],5);return;}
-  let cached=0,queued=0;
-  visible.forEach(r=>{
-    const key=geoCacheKey(r);
-    if(key&&Object.prototype.hasOwnProperty.call(geoCache,key)){
-      const point=geoCache[key];
-      if(point&&Number.isFinite(point.lat)&&Number.isFinite(point.lon)){addRestaurantMarker(r,point.lat,point.lon);cached++;}
-    }else if(key){enqueueGeocode(r,version);queued++;}
-  });
-  if(cached)updateMapBounds();
-  status.textContent=queued?`位置情報を取得中…（${queued}件）${cached?`・取得済み ${cached}件`:""}`:
-    `${mapMarkers.size}店舗を地図に表示しています。位置が見つからない店舗は住所を確認してください。`;
-  setTimeout(()=>{if(restaurantMap)restaurantMap.invalidateSize();},120);
-}
-window.addEventListener("resize",()=>{if(restaurantMap)setTimeout(()=>restaurantMap.invalidateSize(),150);});
-
 function selectEvent(id){closePopups();
   const e=events.find(x=>x.id===id);if(!e)return;
   setFilters({eventSearch:e.name});
@@ -1021,7 +882,6 @@ function openDetail(id,focusReview){
   if(!restaurants.find(x=>x.id===id))return;
   track("shop_click",id);
   detailId=id;renderDetail();
-  focusRestaurant(id,false);
   const d=document.getElementById("detailDialog");
   if(!d.open)d.showModal();
   if(focusReview)document.getElementById("detailReviewInput").focus();
@@ -1035,7 +895,7 @@ function renderDetail(){
     <h2>${escapeHTML(r.name)}</h2>
     <div class="tags"><span class="tag">${escapeHTML(r.genre||"未分類")}</span>${liveTagsHTML(r)}</div>
     <div class="meta">📍 ${escapeHTML(r.venue)} 周辺${r.walk_min?`・🚶徒歩${r.walk_min}分`:""}<br>${escapeHTML(r.address)}</div>
-    <div class="actions"><button class="map-focus-btn" onclick="closeDetail();focusRestaurant('${r.id}',true)">サイト内地図で見る</button><button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップで見る</button>${SHARED?`<button class="secondary" onclick="shareShop('${r.id}')">Xで共有</button>`:""}${SHARED?`<button class="orange" onclick="reportItem('restaurants','${r.id}')">通報</button>`:""}</div>
+    <div class="actions"><button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップで見る</button>${SHARED?`<button class="secondary" onclick="shareShop('${r.id}')">Xで共有</button>`:""}${SHARED?`<button class="orange" onclick="reportItem('restaurants','${r.id}')">通報</button>`:""}</div>
     <h3>口コミ一覧（${list.length}件）</h3>
     <div class="review-list">${list.map(v=>`<div class="review">
       <div class="review-head"><span>${escapeHTML(fmtDate(v.date))}</span><span>${canDel(v.id)?`<button class="danger" onclick="deleteReview('${v.id}')">削除</button>`:""}${SHARED?` <button class="orange" onclick="reportItem('reviews','${v.id}')">通報</button>`:""}</span></div>
