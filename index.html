@@ -313,7 +313,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
       </div>
       <aside class="map-pane" aria-label="店舗の地図">
         <div id="restaurantMap" role="application" aria-label="店舗の位置を示す地図"></div>
-        <p class="map-status" id="mapStatus">店舗の位置情報を読み込んでいます。</p>
+        <p class="map-status" id="mapStatus">住所から店舗の位置を自動取得しています。</p>
       </aside>
     </div>
   </section>
@@ -325,7 +325,7 @@ footer .fine{font-size:12px;opacity:.75;max-width:520px;margin:10px auto 0;line-
       <div><label for="newName">お店の名前</label><input id="newName" maxlength="50" placeholder="お店の名前"></div>
       <div><label for="newVenue">近くのライブ会場</label><select class="picker" data-for="newVenue" data-kind="venue"></select><input id="newVenue" maxlength="50" placeholder="会場名を入力" hidden></div>
       <div><label for="newGenre">料理ジャンル</label><select class="picker" data-for="newGenre" data-kind="genre"></select><input id="newGenre" maxlength="30" placeholder="ジャンルを入力" hidden></div>
-      <div><label for="newAddress">住所</label><input id="newAddress" maxlength="100" placeholder="お店の住所"></div>
+      <div><label for="newAddress">住所</label><input id="newAddress" maxlength="100" placeholder="お店の住所"><small class="form-note">住所から地図上の位置を自動取得します。緯度・経度の入力は不要です。</small></div>
       <div><label for="newWalk">会場から徒歩（分）</label><input id="newWalk" type="number" min="1" max="120" inputmode="numeric" placeholder="例：7（わかる範囲で）"></div>
     </div>
     <label for="newReview" style="margin-top:16px">口コミ・おすすめポイント</label>
@@ -792,7 +792,7 @@ function renderRestaurants(){
     <p class="meta">${escapeHTML(latestReview(r)||"口コミはまだありません。")}</p>
     <div class="actions" onclick="event.stopPropagation()">
       <button class="map-focus-btn" onclick="focusRestaurant('${r.id}',true)">地図で見る</button>
-      ${canEdit()?`<button class="secondary" onclick="startSetRestaurantLocation('${r.id}')">位置を設定・修正</button>`:""}
+      ${canEdit()?`<button class="secondary" onclick="startSetRestaurantLocation('${r.id}')">地図上で位置を修正</button>`:""}
       <button class="secondary" onclick="openMap('${safeEnc(r.name+" "+r.address)}')">Googleマップ</button>
       <button class="orange" onclick="reviewRestaurant('${r.id}')">口コミを書く</button>
       ${SHARED?`<button class="secondary" onclick="shareShop('${r.id}')">Xで共有</button>`:""}
@@ -803,8 +803,8 @@ function renderRestaurants(){
   document.getElementById("empty").hidden=visible.length!==0;
   renderRestaurantMap();
 }
-// ===== 店舗地図（Leaflet + OpenStreetMap + Photon住所検索）=====
-// 店舗座標はSupabaseに保存。端末ごとの住所検索・localStorage依存をなくす。
+// ===== 店舗地図（住所から自動位置検索）=====
+// 利用者は住所だけを登録。座標は内部データとしてSupabaseに保存し、次回以降の検索を省略。
 let restaurantMap=null,mapMarkers=new Map(),geoQueue=[],geoPending=new Set(),geoRunning=false;
 function geoCacheKey(r){return String(r.address||"").normalize("NFKC").replace(/[〒]/g,"").trim();}
 function setMapView(view){
@@ -861,14 +861,19 @@ function focusRestaurant(id,openPopup=true){
 }
 async function geocodeAddress(r){
   const address=geoCacheKey(r);if(!address)return null;
-  // 住所単独で見つからない場合は店舗名・会場名も加えて再検索する。
-  const queries=[address+" 日本",r.name+" "+r.venue+" "+address+" 日本"];
+  // 住所を最優先。住所だけで候補がない場合に限り店舗名を補助語として使う。
+  const queries=[address+" 日本",r.name+" "+address+" 日本"];
   for(const q of queries){
     try{
-      const response=await fetch("https://photon.komoot.io/api/?limit=5&lang=ja&q="+encodeURIComponent(q),{headers:{Accept:"application/json"}});
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),10000);
+      let response;
+      try{response=await fetch("https://photon.komoot.io/api/?limit=10&lang=ja&q="+encodeURIComponent(q),{headers:{Accept:"application/json"},signal:controller.signal});}
+      finally{clearTimeout(timeout);}
       if(!response.ok)continue;
       const data=await response.json(),features=data.features||[];
-      const feature=features.find(f=>{const c=f.properties||{};return !c.country||/日本|Japan/i.test(c.country);})||features[0];
+      // 国名が日本と確認できる候補だけを採用し、海外の同名住所への誤ピンを防ぐ。
+      const feature=features.find(f=>/^(日本|Japan)$/i.test(String((f.properties||{}).country||"").trim()));
       const coords=feature&&feature.geometry&&feature.geometry.coordinates;
       if(coords&&Number.isFinite(Number(coords[0]))&&Number.isFinite(Number(coords[1])))return {lat:Number(coords[1]),lon:Number(coords[0])};
     }catch(e){console.warn("住所検索に失敗しました",q,e);}
